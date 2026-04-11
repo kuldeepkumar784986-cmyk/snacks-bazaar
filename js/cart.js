@@ -486,7 +486,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Wire CHECKOUT button → open checkout modal (not Razorpay directly)
   document.querySelectorAll('.btn-checkout, .btn-add-to-cart').forEach(btn => {
     if (btn.textContent.trim().toUpperCase() === 'CHECKOUT') {
-      btn.removeEventListener('click', initiateCheckout); // remove old handler if any
       btn.onclick = null;
       btn.addEventListener('click', openCheckout);
     }
