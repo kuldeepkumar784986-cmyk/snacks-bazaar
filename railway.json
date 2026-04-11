@@ -1,7 +1,6 @@
 {
   "build": {
-    "builder": "NIXPACKS",
-    "watchPatterns": ["bakend/**"]
+    "builder": "NIXPACKS"
   },
   "deploy": {
     "startCommand": "node bakend/server.js",
