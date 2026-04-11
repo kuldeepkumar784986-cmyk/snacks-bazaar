@@ -1,1 +1,10 @@
-{"deploy":{"startCommand":"node bakend/server.js"}}
+{
+  "build": {
+    "builder": "NIXPACKS",
+    "watchPatterns": ["bakend/**"]
+  },
+  "deploy": {
+    "startCommand": "node bakend/server.js",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
