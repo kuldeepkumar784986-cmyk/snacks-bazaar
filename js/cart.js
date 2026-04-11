@@ -5,7 +5,7 @@
 //  • Calls backend when available, degrades gracefully otherwise
 // ═══════════════════════════════════════════════════════════════
 
-const API_BASE = 'http://localhost:5001/api';
+const API_BASE = 'https://snacks-bazaar-production.up.railway.app/api';
 
 // ──────────────────── Cart State ────────────────────
 let cart = [];
@@ -318,11 +318,24 @@ async function processCOD(customer, total) {
   btn.disabled = true;
   btn.innerHTML = '<span class="pay-spinner"></span> Placing Order...';
 
-  // Simulate a short processing delay
-  await new Promise(r => setTimeout(r, 1200));
-
-  const orderId = 'SB-COD-' + Date.now().toString(36).toUpperCase();
-  showOrderSuccess(orderId, customer);
+  try {
+    const res = await fetch(`${API_BASE}/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        amount: total, 
+        items: cart.map(i => ({ productId: i.id, name: i.name, price: i.price, qty: i.qty })), 
+        customer 
+      }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message);
+    
+    showOrderSuccess(data.orderId, customer);
+  } catch (err) {
+    showToast(err.message || 'Failed to place order', 'error');
+    resetPayBtn();
+  }
 }
 
 // ── Razorpay ──
