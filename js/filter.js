@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const imageSrc = product.image || '/images/default-snack.png';
       
       return `
-        <div class="product-card reveal" data-category="${product.category}">
+        <div class="product-card" data-category="${product.category}">
           <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden; background:#f8f8f8;">
             <img src="${imageSrc}" alt="${product.name}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'">
           </div>
