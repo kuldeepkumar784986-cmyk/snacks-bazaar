@@ -1,0 +1,8 @@
+{
+  "name": "snacks-bazaar",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node bakend/server.js",
+    "install": "cd bakend && npm install"
+  }
+}
