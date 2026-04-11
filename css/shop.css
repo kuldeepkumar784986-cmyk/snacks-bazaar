@@ -1,0 +1,81 @@
+.filter-bar {
+  display: flex;
+  gap: 1rem;
+  padding: 2rem 5rem;
+  background: white;
+  border-bottom: 1px solid #eee;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: none;
+  border: 2px solid var(--color-purple-light);
+  border-radius: 999px;
+  padding: 0.5rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+  background: var(--color-purple-deep);
+  color: white;
+  border-color: var(--color-purple-deep);
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 2rem;
+  padding: 3rem 5rem;
+  background: var(--color-off-white);
+  min-height: 50vh;
+}
+
+/* Quantity Stepper */
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 0.75rem;
+  border: 2px solid var(--color-purple-deep);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.qty-stepper__btn {
+  background: none;
+  border: none;
+  width: 38px;
+  height: 38px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-purple-deep);
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.qty-stepper__btn:hover {
+  background: var(--color-purple-deep);
+  color: white;
+}
+
+.qty-stepper__count {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-purple-deep);
+  min-width: 36px;
+  text-align: center;
+  border-left: 2px solid var(--color-purple-light);
+  border-right: 2px solid var(--color-purple-light);
+  padding: 0.4rem 0;
+}

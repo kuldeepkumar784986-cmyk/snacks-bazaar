@@ -1,0 +1,141 @@
+.product-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  padding: 4rem 5rem;
+  background: white;
+}
+
+.product-detail__gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.gallery-main {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #f8f8f8;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-main img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+
+.gallery-thumbs {
+  display: flex;
+  gap: 1rem;
+}
+
+.gallery-thumbs img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  background: #f8f8f8;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.gallery-thumbs img:hover {
+  border-color: var(--color-purple-light);
+}
+
+.product-badge {
+  background: var(--color-purple-light);
+  color: var(--color-purple-deep);
+  font-family: var(--font-accent);
+  font-size: 0.75rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  letter-spacing: 0.05em;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.product-detail__info h1 {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  color: var(--color-purple-deep);
+  text-transform: uppercase;
+  margin: 0.5rem 0;
+  line-height: 1;
+}
+
+.product-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-dark-text);
+  margin-bottom: 1rem;
+}
+
+.product-rating {
+  margin-bottom: 1.5rem;
+  color: #F9C93E;
+}
+
+.product-rating span {
+  color: #888;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+.product-description {
+  margin-bottom: 2rem;
+  color: var(--color-dark-text);
+  line-height: 1.6;
+}
+
+.product-quantity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.product-quantity button {
+  width: 40px; 
+  height: 40px;
+  border: 2px solid var(--color-purple-deep);
+  border-radius: 50%;
+  background: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--color-purple-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.product-quantity button:hover {
+  background: var(--color-purple-deep);
+  color: white;
+}
+
+.product-quantity span {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.product-benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--color-dark-text);
+  font-weight: 600;
+}
+
+.product-benefits span {
+  background: var(--color-off-white);
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+}

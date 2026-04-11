@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snack Bazaar | Shop All</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Han+Sans&family=DM+Sans:wght@400;600;700&family=Nunito:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/nav.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/home.css"> <!-- for product cards -->
+  <link rel="stylesheet" href="/css/shop.css">
+  <link rel="stylesheet" href="/css/checkout.css">
+</head>
+<body>
+  
+  <div class="announcement-bar">Welcome to your healthier delicious snack! 💜</div>
+
+  <nav class="nav">
+    <button class="hamburger" aria-label="Menu">☰</button>
+    <div class="nav__left">
+      <a href="/shop.html">Shop</a>
+      <a href="/our-story.html">Our Story</a>
+    </div>
+    <div class="nav__center">
+      <a href="/index.html" class="logo"><span class="logo-box">SNACK BAZAAR</span></a>
+    </div>
+    <div class="nav__right">
+      <a href="/one-feeds-two.html">One Feeds Two</a>
+      <a href="/find-ollys.html">Find Us</a>
+      <a href="javascript:void(0)" aria-label="Account">👤</a>
+      <a href="javascript:void(0)" aria-label="Cart" onclick="openCart()">🛒 <span class="cart-count">0</span></a>
+    </div>
+  </nav>
+
+  <div class="filter-bar reveal">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="biscuits">Biscuits</button>
+    <button class="filter-btn" data-filter="kurkure">Kurkure</button>
+    <button class="filter-btn" data-filter="lays">Lay's</button>
+    <button class="filter-btn" data-filter="bingo">Bingo</button>
+    <button class="filter-btn" data-filter="uncle-chipps">Uncle Chipps</button>
+    <button class="filter-btn" data-filter="balaji">Balaji Wafers</button>
+    <button class="filter-btn" data-filter="haldirams">Haldiram's</button>
+    <button class="filter-btn" data-filter="too-yumm">Too Yumm!</button>
+    <button class="filter-btn" data-filter="soya-chips">Soya Chips</button>
+    <button class="filter-btn" data-filter="bundles">Bundles</button>
+  </div>
+
+  <section class="shop-grid">
+    <!-- Kurkure -->
+    <div class="product-card reveal" data-category="kurkure">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/kurkure_gen.png" alt="Kurkure Masala Munch" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">MASALA MUNCH<br>KURKURE</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 82g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:101,name:'Masala Munch Kurkure',price:20})">Add to cart</button>
+    </div>
+    
+    <!-- Lay's Magic Masala (Blue) -->
+    <div class="product-card reveal" data-category="lays">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/lays_magic_masala.png" alt="Lay's Magic Masala" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">MAGIC MASALA<br>LAY'S</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 50g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:102,name:'Magic Masala Lay\'s',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Lay's American Style Cream & Onion (Light Green) -->
+    <div class="product-card reveal" data-category="lays">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/lays_cream_onion.png" alt="Lay's American Style Cream & Onion" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">CREAM & ONION<br>LAY'S</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 50g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:130,name:'Lay\'s Cream & Onion',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Lay's Classic Salted (Yellow) -->
+    <div class="product-card reveal" data-category="lays">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/lays_classic_salted.png" alt="Lay's Classic Salted" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">CLASSIC SALTED<br>LAY'S</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 50g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:131,name:'Lay\'s Classic Salted',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Lay's Spanish Tomato Tango (Red) -->
+    <div class="product-card reveal" data-category="lays">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/lays_tomato_tango.png" alt="Lay's Spanish Tomato Tango" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">SPANISH TOMATO TANGO<br>LAY'S</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 50g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:132,name:'Lay\'s Spanish Tomato Tango',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Lay's West Indies Hot 'n' Sweet Chilli (Orange) -->
+    <div class="product-card reveal" data-category="lays">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/lays_hot_chilli.png" alt="Lay's West Indies Hot n Sweet Chilli" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">HOT 'N' SWEET CHILLI<br>LAY'S</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 50g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:133,name:'Lay\'s Hot n Sweet Chilli',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Lay's Chile Limón (Dark Green) -->
+    <div class="product-card reveal" data-category="lays">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/lays_chile_limon.png" alt="Lay's Chile Limon" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">CHILE LIMÓN<br>LAY'S</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 50g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:134,name:'Lay\'s Chile Limon',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Uncle Chipps Spicy Treat -->
+    <div class="product-card reveal" data-category="uncle-chipps">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/uncle_chipps_gen.png" alt="Uncle Chipps Spicy Treat" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">SPICY TREAT<br>UNCLE CHIPPS</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 50g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:114,name:'Uncle Chipps Spicy Treat',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Uncle Chipps Classic Salted -->
+    <div class="product-card reveal" data-category="uncle-chipps">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/uncle_chipps_classic.png" alt="Uncle Chipps Classic Salted" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">CLASSIC SALTED<br>UNCLE CHIPPS</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 50g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:115,name:'Uncle Chipps Classic Salted',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Uncle Chipps Large Spicy Treat -->
+    <div class="product-card reveal" data-category="uncle-chipps">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/uncle_chipps_large.png" alt="Uncle Chipps Large Spicy Treat" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">SPICY TREAT LARGE<br>UNCLE CHIPPS</div>
+      <div class="product-card__subtitle">MRP: ₹40.00 • 80g</div>
+      <div class="product-card__price">₹40.00</div>
+      <button class="btn-primary" onclick="addToCart({id:116,name:'Uncle Chipps Large Spicy Treat',price:40})">Add to cart</button>
+    </div>
+
+    <!-- Too Yumm! -->
+    <div class="product-card reveal" data-category="too-yumm">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/too_yumm_gen.png" alt="Tomato Blast Too Yumm!" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">TOMATO BLAST<br>TOO YUMM!</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 60g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:103,name:'Tomato Blast Too Yumm',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Haldirams -->
+    <div class="product-card reveal" data-category="haldirams">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/aloo_bhujia.png" alt="Haldiram's Aloo Bhujia" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">ALOO BHUJIA<br>HALDIRAM'S</div>
+      <div class="product-card__subtitle">MRP: ₹55.00 • 200g</div>
+      <div class="product-card__price">₹55.00</div>
+      <button class="btn-primary" onclick="addToCart({id:104,name:'Aloo Bhujia',price:55})">Add to cart</button>
+    </div>
+
+    <!-- Balaji - Crunchem Masala Masti -->
+    <div class="product-card reveal" data-category="balaji">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/balaji_masala_masti.png" alt="Balaji Crunchem Masala Masti" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">MASALA MASTI<br>CRUNCHEM</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 65g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:120,name:'Crunchem Masala Masti',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Balaji - Crunches Chilli Tadka -->
+    <div class="product-card reveal" data-category="balaji">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/balaji_chilli_tadka.png" alt="Balaji Crunches Chilli Tadka" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">CHILLI TADKA<br>CRUNCHES</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 65g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:121,name:'Crunches Chilli Tadka',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Balaji - Crunchem Chaat Chakra -->
+    <div class="product-card reveal" data-category="balaji">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/balaji_chaat_chakra.png" alt="Balaji Crunchem Chaat Chakra" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">CHAAT CHAKRA<br>CRUNCHEM</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 65g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:122,name:'Crunchem Chaat Chakra',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Balaji - Crunched Cream & Onion -->
+    <div class="product-card reveal" data-category="balaji">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/balaji_cream_onion.png" alt="Balaji Crunched Cream & Onion" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">CREAM & ONION<br>CRUNCHED</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 65g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:123,name:'Crunched Cream & Onion',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Balaji - Crunched Peri Peri -->
+    <div class="product-card reveal" data-category="balaji">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/balaji_peri_peri.png" alt="Balaji Crunched Peri Peri" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">PERI PERI<br>CRUNCHED</div>
+      <div class="product-card__subtitle">MRP: ₹10.00 • 35g</div>
+      <div class="product-card__price">₹10.00</div>
+      <button class="btn-primary" onclick="addToCart({id:124,name:'Crunched Peri Peri',price:10})">Add to cart</button>
+    </div>
+
+    <!-- Balaji - Crunched Simply Salted -->
+    <div class="product-card reveal" data-category="balaji">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/balaji_simply_salted.png" alt="Balaji Crunched Simply Salted" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">SIMPLY SALTED<br>CRUNCHED</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 65g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:125,name:'Crunched Simply Salted',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Balaji - Rumbles Pudina Twist -->
+    <div class="product-card reveal" data-category="balaji">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/balaji_pudina_twist.png" alt="Balaji Rumbles Pudina Twist" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">PUDINA TWIST<br>RUMBLES</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 65g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:126,name:'Rumbles Pudina Twist',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Balaji - Crunched Tomato Twist -->
+    <div class="product-card reveal" data-category="balaji">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/balaji_tomato_twist.png" alt="Balaji Crunched Tomato Twist" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">TOMATO TWIST<br>CRUNCHED</div>
+      <div class="product-card__subtitle">MRP: ₹20.00 • 65g</div>
+      <div class="product-card__price">₹20.00</div>
+      <button class="btn-primary" onclick="addToCart({id:127,name:'Crunched Tomato Twist',price:20})">Add to cart</button>
+    </div>
+
+    <!-- Soya Chips -->
+    <div class="product-card reveal" data-category="soya-chips">
+      <div style="background:#f8f8f8; aspect-ratio:1; border-radius:8px; margin-bottom:1rem; display:flex; align-items:center; justify-content:center; color:#ccc;">Soya Chips</div>
+      <div class="product-card__title">MASALA<br>SOYA CHIPS</div>
+      <div class="product-card__subtitle">MRP: ₹50.00 • 100g</div>
+      <div class="product-card__price">₹50.00</div>
+      <button class="btn-primary" onclick="addToCart({id:105,name:'Masala Soya Chips',price:50})">Add to cart</button>
+    </div>
+
+    <!-- Parle-G -->
+    <div class="product-card reveal" data-category="biscuits">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/parle_g.png" alt="Parle-G Original Biscuits" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">PARLE-G ORIGINAL<br>PARLE</div>
+      <div class="product-card__subtitle">MRP: ₹25.00 • 250g</div>
+      <div class="product-card__price">₹25.00</div>
+      <button class="btn-primary" onclick="addToCart({id:106,name:'Parle-G Original',price:25})">Add to cart</button>
+    </div>
+
+    <!-- Marie Gold -->
+    <div class="product-card reveal" data-category="biscuits">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/marie_gold.png" alt="Marie Gold Britannia Biscuits" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">MARIE GOLD<br>BRITANNIA</div>
+      <div class="product-card__subtitle">MRP: ₹45.00 • 250g</div>
+      <div class="product-card__price">₹45.00</div>
+      <button class="btn-primary" onclick="addToCart({id:107,name:'Marie Gold',price:45})">Add to cart</button>
+    </div>
+
+    <!-- Good Day Cashew -->
+    <div class="product-card reveal" data-category="biscuits">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/good_day.png" alt="Good Day Cashew Britannia" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">GOOD DAY CASHEW<br>BRITANNIA</div>
+      <div class="product-card__subtitle">MRP: ₹40.00 • 200g</div>
+      <div class="product-card__price">₹40.00</div>
+      <button class="btn-primary" onclick="addToCart({id:108,name:'Good Day Cashew',price:40})">Add to cart</button>
+    </div>
+
+    <!-- Hide & Seek -->
+    <div class="product-card reveal" data-category="biscuits">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/hide_seek.png" alt="Parle Hide & Seek Biscuits" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">HIDE & SEEK<br>PARLE</div>
+      <div class="product-card__subtitle">MRP: ₹30.00 • 120g</div>
+      <div class="product-card__price">₹30.00</div>
+      <button class="btn-primary" onclick="addToCart({id:109,name:'Hide & Seek',price:30})">Add to cart</button>
+    </div>
+
+    <!-- Bourbon -->
+    <div class="product-card reveal" data-category="biscuits">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/bourbon.png" alt="Britannia Bourbon Biscuits" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">BOURBON<br>BRITANNIA</div>
+      <div class="product-card__subtitle">MRP: ₹30.00 • 150g</div>
+      <div class="product-card__price">₹30.00</div>
+      <button class="btn-primary" onclick="addToCart({id:110,name:'Bourbon',price:30})">Add to cart</button>
+    </div>
+
+    <!-- Dark Fantasy -->
+    <div class="product-card reveal" data-category="biscuits">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/dark_fantasy.png" alt="Sunfeast Dark Fantasy Biscuits" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">DARK FANTASY<br>SUNFEAST</div>
+      <div class="product-card__subtitle">MRP: ₹30.00 • 75g</div>
+      <div class="product-card__price">₹30.00</div>
+      <button class="btn-primary" onclick="addToCart({id:111,name:'Dark Fantasy',price:30})">Add to cart</button>
+    </div>
+
+    <!-- Oreo -->
+    <div class="product-card reveal" data-category="biscuits">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/oreo.png" alt="Cadbury Oreo Original Biscuits" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">OREO ORIGINAL<br>CADBURY</div>
+      <div class="product-card__subtitle">MRP: ₹35.00 • 116g</div>
+      <div class="product-card__price">₹35.00</div>
+      <button class="btn-primary" onclick="addToCart({id:112,name:'Oreo Original',price:35})">Add to cart</button>
+    </div>
+
+    <!-- Milk Bikis -->
+    <div class="product-card reveal" data-category="biscuits">
+      <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden;">
+        <img src="/images/milk_bikis.png" alt="Britannia Milk Bikis" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="product-card__title">MILK BIKIS<br>BRITANNIA</div>
+      <div class="product-card__subtitle">MRP: ₹30.00 • 150g</div>
+      <div class="product-card__price">₹30.00</div>
+      <button class="btn-primary" onclick="addToCart({id:113,name:'Milk Bikis',price:30})">Add to cart</button>
+    </div>
+  </section>
+
+  <!-- Mini Cart Drawer -->
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer__header">
+      <h3>YOUR CART</h3>
+      <button onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-drawer__items" id="cartItems"></div>
+    <div class="cart-drawer__footer">
+      <div class="cart-subtotal">
+        <span>Subtotal</span>
+        <span id="cartTotal">₹0.00</span>
+      </div>
+      <button class="btn-add-to-cart btn-checkout" onclick="openCheckout()">CHECKOUT</button>
+    </div>
+  </div>
+  <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/filter.js"></script>
+  <script src="/js/animations.js"></script>
+  <script src="/js/stepper.js"></script>
+</body>
+</html>

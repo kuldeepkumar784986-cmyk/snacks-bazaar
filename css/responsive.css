@@ -1,0 +1,53 @@
+/* Responsive Overrides */
+@media (max-width: 1024px) {
+  .hero { 
+    grid-template-columns: 1fr; 
+    padding: 3rem; 
+    text-align: center;
+  }
+  .hero__subtext {
+    margin: 1.5rem auto;
+  }
+  .categories__grid { grid-template-columns: repeat(2, 1fr); }
+  .bestsellers__grid { grid-template-columns: repeat(2, 1fr); }
+  .pillars__grid { grid-template-columns: 1fr; }
+  .product-detail { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .hero { padding: 3rem 1.5rem; }
+  .hero__headline { font-size: clamp(3rem, 15vw, 5rem); }
+  
+  .press-bar { padding: 3rem 1.5rem; }
+  .press-bar__logos { gap: 1.5rem; }
+  
+  .categories { padding: 3rem 1.5rem; }
+  .categories__grid { grid-template-columns: 1fr; }
+  
+  .bestsellers { padding: 3rem 1.5rem; }
+  .bestsellers__grid { grid-template-columns: 1fr; }
+  
+  .split-banner { grid-template-columns: 1fr; }
+  .split-banner__text { padding: 3rem 1.5rem; align-items: center; text-align: center; }
+  
+  .pillars { padding: 4rem 1.5rem; }
+  
+  .feature-purple { padding: 4rem 1.5rem; }
+  
+  .charity-banner { grid-template-columns: 1fr; padding: 3rem 1.5rem; text-align: center; }
+  .charity-banner__text h2 { margin: 0 auto; }
+  .charity-banner__image { margin-top: 2rem; }
+  
+  .reviews-carousel { padding: 3rem 1.5rem; }
+  .review-slide { flex-direction: column; text-align: center; gap: 2rem; }
+  .review-slide__image { width: 100%; max-width: 280px; height: 300px; }
+  
+  .shop-grid { padding: 2rem 1.5rem; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .filter-bar { padding: 1.5rem; }
+  
+  .product-detail { padding: 2rem 1.5rem; }
+  
+  .find-hero { padding: 3rem 1.5rem; }
+  .retailers { padding: 3rem 1.5rem; }
+  .retailer-logos { gap: 2rem; }
+}

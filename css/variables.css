@@ -1,0 +1,27 @@
+:root {
+  --color-purple-deep:    #3D1A8E;   /* Primary: deep grape purple — hero backgrounds, footer, CTAs */
+  --color-purple-mid:     #5B2ECC;   /* Secondary purple — section backgrounds, accents */
+  --color-purple-light:   #C3B1E1;   /* Lavender tint — soft section backgrounds, cards */
+  --color-blush:          #F0D9D9;   /* Warm blush/pink — alternating section backgrounds */
+  --color-peach:          #F5E6C8;   /* Warm cream/peach — neutral section backgrounds */
+  --color-teal:           #3DCFB8;   /* Bag color accent — used for highlights */
+  --color-orange:         #F4803A;   /* Bag color accent — product highlights */
+  --color-pink-hot:       #FF5E8A;   /* Bag color accent — product highlights */
+  --color-yellow:         #F9C93E;   /* Bag color accent — product highlights */
+  --color-green:          #4CAF50;   /* Bag color accent */
+  --color-white:          #FFFFFF;
+  --color-off-white:      #FAF8F5;
+  --color-dark-text:      #1A0E45;   /* Near-black with purple undertone — body text */
+
+  /* Typography */
+  --font-display: 'Bebas Neue', 'Black Han Sans', sans-serif;
+  --font-body:    'DM Sans', 'Nunito', sans-serif;
+  --font-accent:  'Space Mono', 'IBM Plex Mono', monospace;
+
+  /* Heading sizes */
+  --h1: clamp(3.5rem, 10vw, 9rem);   /* Massive, screen-filling */
+  --h2: clamp(2.5rem, 6vw, 5rem);
+  --h3: clamp(1.5rem, 3vw, 2.5rem);
+  --body: 1rem;
+  --small: 0.875rem;
+}

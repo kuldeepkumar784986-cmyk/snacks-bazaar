@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snack Bazaar | Find Us</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Han+Sans&family=DM+Sans:wght@400;600;700&family=Nunito:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/nav.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/checkout.css">
+  <style>
+    .find-hero {
+      background-color: var(--color-purple-deep);
+      background-image: repeating-conic-gradient(
+        rgba(255,255,255,0.05) 0deg 10deg,
+        transparent 10deg 20deg
+      );
+    }
+    .retailer-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 4rem;
+    }
+    .retailer-text {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--color-dark-text);
+      opacity: 0.6;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .retailer-text:hover {
+      opacity: 1;
+      color: var(--color-purple-deep);
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <button class="hamburger" aria-label="Menu">☰</button>
+    <div class="nav__left">
+      <a href="/shop.html">Shop</a>
+      <a href="/our-story.html">Our Story</a>
+    </div>
+    <div class="nav__center">
+      <a href="/index.html" class="logo"><span class="logo-box">SNACK BAZAAR</span></a>
+    </div>
+    <div class="nav__right">
+      <a href="/one-feeds-two.html">One Feeds Two</a>
+      <a href="/find-ollys.html">Find Us</a>
+      <a href="javascript:void(0)" aria-label="Account">👤</a>
+      <a href="javascript:void(0)" aria-label="Cart" onclick="openCart()">🛒 <span class="cart-count">0</span></a>
+    </div>
+  </nav>
+
+  <section class="find-hero reveal" style="text-align:center; padding:5rem; color:white;">
+    <h1 style="font-size:var(--h1);">FIND US</h1>
+    <p style="font-family:var(--font-body); margin-top:1rem; font-size:1.1rem;">Available online and in stores nationwide.</p>
+  </section>
+
+  <section class="retailers reveal" style="padding:5rem; background:white;">
+    <h2 style="text-align:center; font-family:var(--font-display); font-size:var(--h2); color:var(--color-purple-deep); text-transform:uppercase; margin-bottom:3rem;">
+      FIND US IN STORE
+    </h2>
+    <div class="retailer-logos">
+      <!-- Using text placeholders for logos -->
+      <span class="retailer-text">RELIANCE SMART</span>
+      <span class="retailer-text">BIG BAZAAR</span>
+      <span class="retailer-text">D-MART</span>
+      <span class="retailer-text">SPAR</span>
+      <span class="retailer-text">MORE MEGASTORE</span>
+      <span class="retailer-text">NATURE'S BASKET</span>
+    </div>
+  </section>
+
+  <!-- Mini Cart Drawer -->
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer__header">
+      <h3>YOUR CART</h3>
+      <button onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-drawer__items" id="cartItems"></div>
+    <div class="cart-drawer__footer">
+      <div class="cart-subtotal"><span>Subtotal</span><span id="cartTotal">₹0.00</span></div>
+      <button class="btn-add-to-cart btn-checkout" onclick="openCheckout()">CHECKOUT</button>
+    </div>
+  </div>
+  <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/animations.js"></script>
+</body>
+</html>
