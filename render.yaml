@@ -1,0 +1,34 @@
+# render.yaml — Snack Bazaar Backend (Auto-deploy config for Render.com)
+# Render reads this file automatically from the repo root.
+# Docs: https://render.com/docs/infrastructure-as-code
+
+services:
+  - type: web
+    name: snack-bazaar-backend
+    runtime: node
+    rootDir: bakend
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
+    region: singapore   # closest to India
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000      # Render assigns this automatically, but set explicitly
+      - key: MONGO_URI
+        sync: false       # Set manually in Render dashboard (secret)
+      - key: JWT_SECRET
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_FROM_EMAIL
+        value: kuldeepkumar784986@gmail.com
+      - key: BREVO_FROM_NAME
+        value: Snack Bazaar
+      - key: ADMIN_EMAIL
+        value: kuldeepkumar784986@gmail.com
