@@ -12,6 +12,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
+const jwt    = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET || 'snackbazaar_secret_2026';
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -109,6 +112,35 @@ const orderSchema = new mongoose.Schema(
 );
 
 const Order = mongoose.model('Order', orderSchema);
+
+// Customer Schema
+const customerSchema = new mongoose.Schema({
+  name:     { type: String, required: true },
+  email:    { type: String, required: true, unique: true, lowercase: true },
+  phone:    { type: String, required: true },
+  password: { type: String, required: true },
+  savedAddress: {
+    line1:   String,
+    city:    String,
+    state:   String,
+    pincode: String,
+  },
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+}, { timestamps: true });
+
+const Customer = mongoose.model('Customer', customerSchema);
+
+// ── Auth Middleware ───────────────────────────────────────────
+function verifyCustomer(req, res, next) {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ success: false, message: 'Please login first' });
+  try {
+    req.customer = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch {
+    res.status(401).json({ success: false, message: 'Session expired, please login again' });
+  }
+}
 
 // Helper to generate unique Order ID (e.g. SB-1001)
 async function generateOrderId() {
@@ -489,6 +521,105 @@ app.post('/api/payment/phonepe/create-order', async (req, res) => {
   res.json({ success: true, message: 'PhonePe integration ready' });
 });
 */
+
+// ═══════════════════════════════════════════════════════════════
+//  CUSTOMER AUTH ROUTES
+// ═══════════════════════════════════════════════════════════════
+
+// ── REGISTER ─────────────────────────────────────────────────
+app.post('/api/customers/register', async (req, res) => {
+  try {
+    const { name, email, phone, password } = req.body;
+    const exists = await Customer.findOne({ email });
+    if (exists) return res.status(400).json({ success: false, message: 'Email already registered. Please login.' });
+    const hashed  = await bcrypt.hash(password, 10);
+    const customer = await Customer.create({ name, email, phone, password: hashed });
+    const token = jwt.sign({ id: customer._id, email: customer.email, name: customer.name }, JWT_SECRET, { expiresIn: '30d' });
+    res.status(201).json({ success: true, token, customer: { id: customer._id, name: customer.name, email: customer.email, phone: customer.phone } });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+// ── LOGIN ─────────────────────────────────────────────────────
+app.post('/api/customers/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const customer = await Customer.findOne({ email });
+    if (!customer) return res.status(400).json({ success: false, message: 'No account found with this email.' });
+    const match = await bcrypt.compare(password, customer.password);
+    if (!match) return res.status(400).json({ success: false, message: 'Wrong password. Try again.' });
+    const token = jwt.sign({ id: customer._id, email: customer.email, name: customer.name }, JWT_SECRET, { expiresIn: '30d' });
+    res.json({ success: true, token, customer: { id: customer._id, name: customer.name, email: customer.email, phone: customer.phone, savedAddress: customer.savedAddress } });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+// ── GET PROFILE ───────────────────────────────────────────────
+app.get('/api/customers/profile', verifyCustomer, async (req, res) => {
+  try {
+    const customer = await Customer.findById(req.customer.id).select('-password').populate('wishlist', 'name price images discountPrice');
+    res.json({ success: true, customer });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+// ── UPDATE PROFILE ────────────────────────────────────────────
+app.put('/api/customers/profile', verifyCustomer, async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+    const customer = await Customer.findByIdAndUpdate(req.customer.id, { name, phone }, { new: true }).select('-password');
+    res.json({ success: true, customer });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+// ── SAVE ADDRESS ──────────────────────────────────────────────
+app.put('/api/customers/address', verifyCustomer, async (req, res) => {
+  try {
+    const { line1, city, state, pincode } = req.body;
+    const customer = await Customer.findByIdAndUpdate(req.customer.id, { savedAddress: { line1, city, state, pincode } }, { new: true }).select('-password');
+    res.json({ success: true, message: 'Address saved!', customer });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+// ── GET MY ORDERS ─────────────────────────────────────────────
+app.get('/api/customers/my-orders', verifyCustomer, async (req, res) => {
+  try {
+    const orders = await Order.find({ 'customer.email': req.customer.email }).sort({ createdAt: -1 });
+    res.json({ success: true, orders });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+// ── WISHLIST: ADD/REMOVE ──────────────────────────────────────
+app.post('/api/customers/wishlist/:productId', verifyCustomer, async (req, res) => {
+  try {
+    const customer = await Customer.findById(req.customer.id);
+    const pid = req.params.productId;
+    const idx = customer.wishlist.map(String).indexOf(pid);
+    if (idx > -1) customer.wishlist.splice(idx, 1);
+    else customer.wishlist.push(pid);
+    await customer.save();
+    res.json({ success: true, wishlist: customer.wishlist, action: idx > -1 ? 'removed' : 'added' });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+// ── GET WISHLIST ──────────────────────────────────────────────
+app.get('/api/customers/wishlist', verifyCustomer, async (req, res) => {
+  try {
+    const customer = await Customer.findById(req.customer.id).populate('wishlist', 'name price discountPrice images category');
+    res.json({ success: true, wishlist: customer.wishlist });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+// ── CHANGE PASSWORD ───────────────────────────────────────────
+app.put('/api/customers/change-password', verifyCustomer, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const customer = await Customer.findById(req.customer.id);
+    const match = await bcrypt.compare(currentPassword, customer.password);
+    if (!match) return res.status(400).json({ success: false, message: 'Current password is wrong' });
+    customer.password = await bcrypt.hash(newPassword, 10);
+    await customer.save();
+    res.json({ success: true, message: 'Password changed successfully!' });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
 
 // ──────────────────── Health Check ────────────────────
 app.get('/api/health', (req, res) => {
