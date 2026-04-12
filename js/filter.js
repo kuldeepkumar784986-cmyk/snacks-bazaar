@@ -39,15 +39,24 @@ document.addEventListener('DOMContentLoaded', () => {
       const safeName = product.name.replace(/'/g, "\\'");
       const imageSrc = product.image || '/images/default-snack.png';
       
+      let outOfStockBadge = '';
+      let btnHtml = `<button class="btn-primary" onclick="addToCart({id:${product.productId}, name: '${safeName}', price: ${product.price}, image: '${imageSrc}'})">Add to cart</button>`;
+      
+      if (product.stock === 0) {
+        outOfStockBadge = `<div style="position: absolute; top: 10px; right: 10px; background: #dc2626; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; z-index: 10;">OUT OF STOCK</div>`;
+        btnHtml = `<button class="btn-primary" disabled style="opacity: 0.5; cursor: not-allowed;">Out of Stock</button>`;
+      }
+
       return `
-        <div class="product-card" data-category="${product.category}">
+        <div class="product-card" data-category="${product.category}" style="position: relative;">
+          ${outOfStockBadge}
           <div style="aspect-ratio:1; border-radius:8px; margin-bottom:1rem; overflow:hidden; background:#f8f8f8;">
             <img src="${imageSrc}" alt="${product.name}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'">
           </div>
           <div class="product-card__title" style="text-transform: uppercase;">${product.name}</div>
           <div class="product-card__subtitle">MRP: ₹${product.price.toFixed(2)} ${product.weight ? '• ' + product.weight : ''}</div>
           <div class="product-card__price">₹${product.price.toFixed(2)}</div>
-          <button class="btn-primary" onclick="addToCart({id:${product.productId}, name: '${safeName}', price: ${product.price}, image: '${imageSrc}'})">Add to cart</button>
+          ${btnHtml}
         </div>
       `;
     }).join('');
