@@ -7,6 +7,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 require('dotenv').config();
+const { sendOrderConfirmationToCustomer, sendNewOrderAlertToAdmin, sendStatusUpdateToCustomer } = require('./mailer');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -233,6 +234,13 @@ app.post('/api/orders', async (req, res) => {
       deliveryStatus: 'pending',
     });
 
+    try { 
+      await sendOrderConfirmationToCustomer(order); 
+      await sendNewOrderAlertToAdmin(order); 
+    } catch(e) { 
+      console.warn('Email error:', e.message); 
+    }
+
     // Reduce stock for each item
     if (items && items.length > 0) {
       const stockUpdates = items.map((item) =>
@@ -332,6 +340,12 @@ app.put('/api/orders/:id/status', async (req, res) => {
     }
 
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+
+    try { 
+      await sendStatusUpdateToCustomer(order, status); 
+    } catch(e) { 
+      console.warn('Email error:', e.message); 
+    }
 
     res.json({ success: true, data: order, message: `Order updated to ${status}` });
   } catch (err) {
