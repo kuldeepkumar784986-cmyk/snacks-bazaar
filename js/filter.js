@@ -87,12 +87,11 @@ document.addEventListener('DOMContentLoaded', () => {
         : '';
 
       return `
-        <div class="product-card" data-category="${product.category}" style="position:relative;">
+        <div class="product-card" data-category="${product.category}" style="position:relative;" data-aos="fade-up">
           ${badge}
           ${outOfStockBadge}
-          <div style="aspect-ratio:1;border-radius:8px;margin-bottom:1rem;overflow:hidden;background:#f8f8f8;">
-            <img src="${imageSrc}" alt="${product.name}"
-              style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
+          <div class="product-img-wrap">
+            <img src="${imageSrc}" alt="${product.name}" onerror="this.style.display='none'">
           </div>
           <div class="product-card__title" style="text-transform:uppercase;">${product.name}</div>
           ${stars}
@@ -100,6 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
           ${lowStockLabel}
           <div class="product-card__price">₹${product.price.toFixed(2)}</div>
           ${btnHtml}
+          <a href="https://wa.me/917849861219?text=${encodeURIComponent('Hey! Check out ' + product.name + ' on Snack Bazaar 🍿 https://snacks-bazaar.vercel.app/shop.html')}"
+             target="_blank" rel="noopener" class="wa-share-btn" title="Share on WhatsApp">
+            💬 Share
+          </a>
         </div>`;
     }).join('');
   }

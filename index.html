@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Snack Bazaar | Home</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Han+Sans&family=DM+Sans:wght@400;600;700&family=Nunito:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
   <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/nav.css">
@@ -59,10 +60,10 @@
   </div>
 
   <!-- Hero Section -->
-  <section class="hero hero-sunburst reveal">
+  <section class="hero hero-sunburst reveal" data-aos="fade-right">
     <div class="hero__text">
       <h1 class="hero__headline">
-        INDIA'S MOST<br>
+        <span class="gradient-text">INDIA'S MOST</span><br>
         <span class="hero__rotating-word" style="width:100%;">
           <span>CRUNCHY 🍟</span>
           <span>SPICY 🌶️</span>
@@ -117,7 +118,7 @@
   </div>
 
   <!-- Press Quote Bar -->
-  <section class="press-bar reveal">
+  <section class="press-bar reveal" data-aos="fade-up">
     <blockquote class="press-bar__quote">
       "These Indian snack combinations are a game-changer on the snacking scene. We're consistently impressed!"
     </blockquote>
@@ -129,8 +130,35 @@
     </div>
   </section>
 
+
+  <!-- Stats Counter Section -->
+  <section class="stats-section" data-aos="fade-up">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number" data-target="10000">0</div>
+        <div class="stat-plus">+</div>
+        <div class="stat-label">Happy Customers</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="60">0</div>
+        <div class="stat-plus">+</div>
+        <div class="stat-label">Snack Varieties</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" data-target="10">0</div>
+        <div class="stat-plus"> Min</div>
+        <div class="stat-label">Avg. Delivery Time</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number stat-decimal" data-target="4.8">0</div>
+        <div class="stat-plus">★</div>
+        <div class="stat-label">Customer Rating</div>
+      </div>
+    </div>
+  </section>
+
   <!-- Category Cards Grid -->
-  <section class="categories reveal">
+  <section class="categories reveal" data-aos="fade-up">
     <div class="categories__grid">
       <a href="/shop.html?cat=kurkure" class="cat-card cat-card--green">
         <img src="/images/my_kurkure.png" alt="Kurkure" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:0; transition: transform 0.3s ease;">
@@ -161,7 +189,7 @@
   </section>
 
   <!-- Split Banner -->
-  <section class="split-banner reveal">
+  <section class="split-banner reveal" data-aos="fade-up">
     <div class="split-banner__text">
       <h2>SNACKS THAT FEED YOUR FEEL G<svg class="smiley smiley-inline" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="3"/>
@@ -183,7 +211,7 @@
   </section>
 
   <!-- Pillars -->
-  <section class="pillars reveal">
+  <section class="pillars reveal" data-aos="fade-up">
     <h2 class="pillars__heading">HOW WE FEED YOUR FEEL GOOD</h2>
     <div class="pillars__grid">
       <div class="pillar">
@@ -274,7 +302,7 @@
   </section>
 
   <!-- Charity Banner -->
-  <section class="charity-banner ripple-bg reveal">
+  <section class="charity-banner" data-aos="fade-up" ripple-bg reveal">
     <div class="charity-banner__text">
       <h2>WITH EVERY ORDER PLACED, WE DONATE A SCHOOL MEAL TO A CHILD IN NEED.</h2>
       <a href="/one-feeds-two.html" class="charity-link">One Feeds Two →</a>
@@ -314,6 +342,22 @@
   </section>
 
   <!-- Footer -->
+  <!-- Brand Values Scrolling Strip -->
+  <div class="brand-values-strip">
+    <div class="brand-values-track">
+      <span class="brand-value-item"><span class="bv-dot"></span> MADE WITH LOVE IN INDIA</span>
+      <span class="brand-value-item"><span class="bv-dot"></span> FRESHNESS GUARANTEED</span>
+      <span class="brand-value-item"><span class="bv-dot"></span> 10 MIN DELIVERY</span>
+      <span class="brand-value-item"><span class="bv-dot"></span> 60+ SNACK VARIETIES</span>
+      <span class="brand-value-item"><span class="bv-dot"></span> NO CRUSHING, EVER</span>
+      <span class="brand-value-item"><span class="bv-dot"></span> MADE WITH LOVE IN INDIA</span>
+      <span class="brand-value-item"><span class="bv-dot"></span> FRESHNESS GUARANTEED</span>
+      <span class="brand-value-item"><span class="bv-dot"></span> 10 MIN DELIVERY</span>
+      <span class="brand-value-item"><span class="bv-dot"></span> 60+ SNACK VARIETIES</span>
+      <span class="brand-value-item"><span class="bv-dot"></span> NO CRUSHING, EVER</span>
+    </div>
+  </div>
+
   <footer class="footer">
     <div class="footer__top">
       <div class="footer__logo-tagline">
@@ -431,6 +475,60 @@
         layer.appendChild(el);
       });
     })();
+  </script>
+
+  <!-- AOS Init + Counter + Ripple -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    // AOS init
+    AOS.init({ duration: 700, once: true, offset: 60, easing: 'ease-out-cubic' });
+
+    // Number counter animation
+    function animateCounters() {
+      document.querySelectorAll('.stat-number').forEach(el => {
+        const target   = parseFloat(el.dataset.target);
+        const isDecimal = el.classList.contains('stat-decimal');
+        const duration = 1800;
+        const step     = 16;
+        const steps    = duration / step;
+        const increment = target / steps;
+        let current = 0;
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) { current = target; clearInterval(timer); }
+          el.textContent = isDecimal ? current.toFixed(1) : Math.floor(current).toLocaleString('en-IN');
+        }, step);
+      });
+    }
+
+    // Trigger counter when stats section is visible
+    const statsObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { animateCounters(); statsObs.disconnect(); } });
+    }, { threshold: 0.3 });
+    const statsEl = document.querySelector('.stats-section');
+    if (statsEl) statsObs.observe(statsEl);
+
+    // Ripple effect on all .btn-primary clicks
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn-primary');
+      if (!btn) return;
+      const ripple = document.createElement('span');
+      ripple.className = 'btn-ripple';
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      ripple.style.cssText = \`
+        position:absolute; border-radius:50%; pointer-events:none;
+        width:\${size}px; height:\${size}px;
+        left:\${e.clientX - rect.left - size/2}px;
+        top:\${e.clientY - rect.top - size/2}px;
+        background:rgba(255,255,255,0.35);
+        transform:scale(0); animation:ripple-anim 0.55s ease-out forwards;
+      \`;
+      btn.style.position = 'relative';
+      btn.style.overflow = 'hidden';
+      btn.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    });
   </script>
 </body>
 </html>
