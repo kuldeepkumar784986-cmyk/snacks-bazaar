@@ -1,10 +1,22 @@
+/* ── Shop page warm background ── */
+body.shop-page {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='2' cy='2' r='1.2' fill='%23e8a04a' fill-opacity='0.18'/%3E%3C/svg%3E"),
+    linear-gradient(175deg, #fffefb 0%, #fff8ec 45%, #fff0d0 100%);
+  background-attachment: local, fixed;
+}
+
 .filter-bar {
   display: flex;
   gap: 1rem;
   padding: 2rem 5rem;
-  background: white;
-  border-bottom: 1px solid #eee;
+  background: rgba(255, 253, 248, 0.92);
+  backdrop-filter: blur(4px);
+  border-bottom: 1px solid rgba(232, 160, 74, 0.18);
   flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .filter-btn {
@@ -31,7 +43,7 @@
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 2rem;
   padding: 3rem 5rem;
-  background: var(--color-off-white);
+  background: transparent; /* inherits warm dot-grid from body */
   min-height: 50vh;
 }
 
