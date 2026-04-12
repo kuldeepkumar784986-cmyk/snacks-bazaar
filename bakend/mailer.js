@@ -1,14 +1,5 @@
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Common styling for emails
 const getEmailStyle = () => `
@@ -43,59 +34,61 @@ const getItemsHtml = (items, totalAmount) => {
 const sendOrderConfirmationToCustomer = async (order) => {
   if (!order.customer || !order.customer.email) return;
 
-  const mailOptions = {
-    from: `"Snack Bazaar" <${process.env.EMAIL_USER}>`,
-    to: order.customer.email,
+  const html = `
+    <html>
+      <head>${getEmailStyle()}</head>
+      <body>
+        <div class="container">
+          <h1>Thank you for your order, ${order.customer.name || 'Snack Lover'}!</h1>
+          <p>We've received your order <strong>${order.orderId}</strong> and are getting it ready for shipment. You chose <strong>${order.paymentMethod}</strong>.</p>
+          <h2>Order Details</h2>
+          ${getItemsHtml(order.items, order.amount)}
+          <h2>Delivery Address</h2>
+          <p>${order.customer.address || 'N/A'}</p>
+          <p>If you have any questions, simply reply to this email!</p>
+          <div class="footer">Snack Bazaar | India's Premium Snack Store</div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  await resend.emails.send({
+    from: 'Snack Bazaar <onboarding@resend.dev>',
+    to: [order.customer.email],
     subject: `Order Confirmation - ${order.orderId}`,
-    html: `
-      <html>
-        <head>${getEmailStyle()}</head>
-        <body>
-          <div class="container">
-            <h1>Thank you for your order, ${order.customer.name || 'Snack Lover'}!</h1>
-            <p>We've received your order <strong>${order.orderId}</strong> and are getting it ready for shipment. You chose <strong>${order.paymentMethod}</strong>.</p>
-            <h2>Order Details</h2>
-            ${getItemsHtml(order.items, order.amount)}
-            <h2>Delivery Address</h2>
-            <p>${order.customer.address || 'N/A'}</p>
-            <p>If you have any questions, simply reply to this email!</p>
-            <div class="footer">Snack Bazaar | India's Premium Snack Store</div>
-          </div>
-        </body>
-      </html>
-    `
-  };
-  return transporter.sendMail(mailOptions);
+    html: html,
+  });
 };
 
 // 2. New Order Alert to Admin
 const sendNewOrderAlertToAdmin = async (order) => {
   if (!process.env.ADMIN_EMAIL) return;
 
-  const mailOptions = {
-    from: `"Snack Bazaar Node" <${process.env.EMAIL_USER}>`,
-    to: process.env.ADMIN_EMAIL,
+  const html = `
+    <html>
+      <head>${getEmailStyle()}</head>
+      <body>
+        <div class="container">
+          <h1>New Order Alert!</h1>
+          <p>A new order was just placed via <strong>${order.paymentMethod}</strong>.</p>
+          <h2>Customer Details</h2>
+          <p><strong>Name:</strong> ${order.customer.name || 'N/A'}<br>
+          <strong>Email:</strong> ${order.customer.email || 'N/A'}<br>
+          <strong>Phone:</strong> ${order.customer.phone || 'N/A'}<br>
+          <strong>Address:</strong> ${order.customer.address || 'N/A'}</p>
+          <h2>Order Items</h2>
+          ${getItemsHtml(order.items, order.amount)}
+        </div>
+      </body>
+    </html>
+  `;
+
+  await resend.emails.send({
+    from: 'Snack Bazaar <onboarding@resend.dev>',
+    to: [process.env.ADMIN_EMAIL],
     subject: `💥 NEW ORDER RECEIVED: ${order.orderId}`,
-    html: `
-      <html>
-        <head>${getEmailStyle()}</head>
-        <body>
-          <div class="container">
-            <h1>New Order Alert!</h1>
-            <p>A new order was just placed via <strong>${order.paymentMethod}</strong>.</p>
-            <h2>Customer Details</h2>
-            <p><strong>Name:</strong> ${order.customer.name || 'N/A'}<br>
-            <strong>Email:</strong> ${order.customer.email || 'N/A'}<br>
-            <strong>Phone:</strong> ${order.customer.phone || 'N/A'}<br>
-            <strong>Address:</strong> ${order.customer.address || 'N/A'}</p>
-            <h2>Order Items</h2>
-            ${getItemsHtml(order.items, order.amount)}
-          </div>
-        </body>
-      </html>
-    `
-  };
-  return transporter.sendMail(mailOptions);
+    html: html,
+  });
 };
 
 // 3. Status Update to Customer
@@ -105,28 +98,29 @@ const sendStatusUpdateToCustomer = async (order, status) => {
   // Format the status string visually
   const formattedStatus = status.replace('_', ' ').toUpperCase();
 
-  const mailOptions = {
-    from: `"Snack Bazaar Delivery" <${process.env.EMAIL_USER}>`,
-    to: order.customer.email,
+  const html = `
+    <html>
+      <head>${getEmailStyle()}</head>
+      <body>
+        <div class="container">
+          <h1>Hi ${order.customer.name || 'there'}!</h1>
+          <p>Your order <strong>${order.orderId}</strong> has a new tracking update.</p>
+          <p style="font-size: 20px; font-weight: bold; color: #ff5e8a; text-align: center; padding: 20px; border: 2px dashed #ff5e8a; border-radius: 8px;">
+            STATUS: ${formattedStatus}
+          </p>
+          <p>If you have any questions about this update, simply reply to this email!</p>
+          <div class="footer">Snack Bazaar | India's Premium Snack Store</div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  await resend.emails.send({
+    from: 'Snack Bazaar <onboarding@resend.dev>',
+    to: [order.customer.email],
     subject: `Update on your order: ${order.orderId}`,
-    html: `
-      <html>
-        <head>${getEmailStyle()}</head>
-        <body>
-          <div class="container">
-            <h1>Hi ${order.customer.name || 'there'}!</h1>
-            <p>Your order <strong>${order.orderId}</strong> has a new tracking update.</p>
-            <p style="font-size: 20px; font-weight: bold; color: #ff5e8a; text-align: center; padding: 20px; border: 2px dashed #ff5e8a; border-radius: 8px;">
-              STATUS: ${formattedStatus}
-            </p>
-            <p>If you have any questions about this update, simply reply to this email!</p>
-            <div class="footer">Snack Bazaar | India's Premium Snack Store</div>
-          </div>
-        </body>
-      </html>
-    `
-  };
-  return transporter.sendMail(mailOptions);
+    html: html,
+  });
 };
 
 module.exports = {
