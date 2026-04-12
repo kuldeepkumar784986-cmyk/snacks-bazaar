@@ -68,6 +68,8 @@ const productSchema = new mongoose.Schema(
     description: { type: String, default: '' },
     stock: { type: Number, default: 100 },
     isActive: { type: Boolean, default: true },
+    averageRating: { type: Number, default: 0 },
+    reviewCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
@@ -129,6 +131,30 @@ const customerSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const Customer = mongoose.model('Customer', customerSchema);
+
+// Review Schema
+const reviewSchema = new mongoose.Schema({
+  customerId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Customer', required: true },
+  customerName: { type: String, required: true },
+  productId:    { type: Number, required: true, index: true },
+  rating:       { type: Number, required: true, min: 1, max: 5 },
+  comment:      { type: String, default: '' },
+}, { timestamps: true });
+
+// One review per customer per product
+reviewSchema.index({ customerId: 1, productId: 1 }, { unique: true });
+const Review = mongoose.model('Review', reviewSchema);
+
+// Helper: recalculate product average rating
+async function recalcAvgRating(productId) {
+  const result = await Review.aggregate([
+    { $match: { productId: productId } },
+    { $group: { _id: null, avg: { $avg: '$rating' }, count: { $sum: 1 } } }
+  ]);
+  const avg = result.length ? Math.round(result[0].avg * 10) / 10 : 0;
+  const count = result.length ? result[0].count : 0;
+  await Product.findOneAndUpdate({ productId }, { averageRating: avg, reviewCount: count });
+}
 
 // ── Auth Middleware ───────────────────────────────────────────
 function verifyCustomer(req, res, next) {
@@ -618,6 +644,83 @@ app.put('/api/customers/change-password', verifyCustomer, async (req, res) => {
     await customer.save();
     res.json({ success: true, message: 'Password changed successfully!' });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+
+// ═══════════════════════════════════════════════════════════════
+//  REVIEW ROUTES
+// ═══════════════════════════════════════════════════════════════
+
+// POST /api/products/:id/reviews — add review (auth required)
+app.post('/api/products/:id/reviews', verifyCustomer, async (req, res) => {
+  try {
+    const productId = Number(req.params.id);
+    const { rating, comment } = req.body;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ success: false, message: 'Rating must be between 1 and 5' });
+    }
+
+    const product = await Product.findOne({ productId });
+    if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
+
+    // Check if already reviewed
+    const existing = await Review.findOne({ customerId: req.customer.id, productId });
+    if (existing) {
+      // Update existing review
+      existing.rating = rating;
+      existing.comment = comment || '';
+      existing.customerName = req.customer.name;
+      await existing.save();
+      await recalcAvgRating(productId);
+      return res.json({ success: true, message: 'Review updated!', review: existing });
+    }
+
+    const review = await Review.create({
+      customerId: req.customer.id,
+      customerName: req.customer.name,
+      productId,
+      rating,
+      comment: comment || '',
+    });
+
+    await recalcAvgRating(productId);
+    res.status(201).json({ success: true, message: 'Review added!', review });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// GET /api/products/:id/reviews — get all reviews for a product
+app.get('/api/products/:id/reviews', async (req, res) => {
+  try {
+    const productId = Number(req.params.id);
+    const reviews = await Review.find({ productId }).sort({ createdAt: -1 });
+    
+    // Also return the product's aggregate rating
+    const product = await Product.findOne({ productId }).select('averageRating reviewCount');
+    
+    res.json({
+      success: true,
+      averageRating: product?.averageRating || 0,
+      reviewCount: product?.reviewCount || 0,
+      reviews,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// DELETE /api/reviews/:id — delete review (admin use)
+app.delete('/api/reviews/:id', async (req, res) => {
+  try {
+    const review = await Review.findByIdAndDelete(req.params.id);
+    if (!review) return res.status(404).json({ success: false, message: 'Review not found' });
+    await recalcAvgRating(review.productId);
+    res.json({ success: true, message: 'Review deleted' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 
