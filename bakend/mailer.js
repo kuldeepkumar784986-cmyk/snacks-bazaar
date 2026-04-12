@@ -65,10 +65,12 @@ const sendOrderConfirmationToCustomer = async (order) => {
   </body></html>`;
 
   const result = await resend.emails.send({
-    from: FROM_ADDRESS,
-    to:   [order.customer.email],
-    subject: `✅ Order Confirmed: ${order.orderId} — Snack Bazaar`,
+    from:     FROM_ADDRESS,
+    to:       [order.customer.email],
+    reply_to: 'kuldeepkumar784986@gmail.com',
+    subject:  `✅ Order Confirmed: ${order.orderId} — Snack Bazaar`,
     html,
+    tags: [{ name: 'category', value: 'order_confirmation' }],
   });
 
   console.log('[MAILER] Customer email sent:', JSON.stringify(result));
@@ -101,10 +103,12 @@ const sendNewOrderAlertToAdmin = async (order) => {
   </body></html>`;
 
   const result = await resend.emails.send({
-    from: FROM_ADDRESS,
-    to:   [to],
-    subject: `💥 NEW ORDER: ${order.orderId} — ₹${order.amount}`,
+    from:     FROM_ADDRESS,
+    to:       [to],
+    reply_to: 'kuldeepkumar784986@gmail.com',
+    subject:  `💥 NEW ORDER: ${order.orderId} — ₹${order.amount}`,
     html,
+    tags: [{ name: 'category', value: 'admin_alert' }],
   });
 
   console.log('[MAILER] Admin email sent:', JSON.stringify(result));
@@ -131,10 +135,12 @@ const sendStatusUpdateToCustomer = async (order, status) => {
   </body></html>`;
 
   const result = await resend.emails.send({
-    from: FROM_ADDRESS,
-    to:   [order.customer.email],
-    subject: `📦 Order Update: ${order.orderId} — ${formattedStatus}`,
+    from:     FROM_ADDRESS,
+    to:       [order.customer.email],
+    reply_to: 'kuldeepkumar784986@gmail.com',
+    subject:  `📦 Order Update: ${order.orderId} — ${formattedStatus}`,
     html,
+    tags: [{ name: 'category', value: 'status_update' }],
   });
 
   console.log('[MAILER] Status update email sent:', JSON.stringify(result));
@@ -148,9 +154,10 @@ const sendTestEmail = async () => {
   console.log('[MAILER] RESEND_API_KEY set:', !!process.env.RESEND_API_KEY);
 
   const result = await resend.emails.send({
-    from: FROM_ADDRESS,
-    to:   [to],
-    subject: '🧪 Snack Bazaar — Email System Test',
+    from:     FROM_ADDRESS,
+    to:       [to],
+    reply_to: 'kuldeepkumar784986@gmail.com',
+    subject:  '🧪 Snack Bazaar — Email System Test',
     html: `<html><body style="font-family:sans-serif;padding:20px;">
       <h2 style="color:#511b8b;">✅ Email System Working!</h2>
       <p>If you received this, Resend is correctly configured on Railway.</p>
@@ -159,6 +166,7 @@ const sendTestEmail = async () => {
       <p><strong>To:</strong> ${to}</p>
       <p style="color:#888;font-size:12px;">Snack Bazaar — snacks-bazaar-production.up.railway.app</p>
     </body></html>`,
+    tags: [{ name: 'category', value: 'test' }],
   });
 
   console.log('[MAILER] Test email result:', JSON.stringify(result));
