@@ -51,6 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Dispatch event after render completes
+    setTimeout(() => document.dispatchEvent(new Event('productsRendered')), 100);
+
     shopGrid.innerHTML = products.map(product => {
       const safeName = product.name.replace(/'/g, "\\'");
       const imageSrc = product.image || '/images/default-snack.png';
@@ -134,4 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   loadProducts();
+
+  // Notify premium.js to refresh AOS after dynamic render
+  document.addEventListener('productsRendered', () => { if (window.AOS) AOS.refresh(); });
 });
