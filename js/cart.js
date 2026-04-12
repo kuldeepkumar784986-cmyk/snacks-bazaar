@@ -65,6 +65,20 @@ function updateCartUI() {
   const countEls = document.querySelectorAll('.cart-count');
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
   countEls.forEach(el => el.textContent = totalQty);
+
+  // Update sticky mobile cart bar
+  const stickyBar = document.getElementById('stickyCartBar');
+  if (stickyBar) {
+    if (totalQty > 0) {
+      stickyBar.classList.add('visible');
+      const sCount = document.getElementById('stickyCartCount');
+      const sTotal = document.getElementById('stickyCartTotal');
+      if (sCount) sCount.textContent = `${totalQty} item${totalQty > 1 ? 's' : ''}`;
+      if (sTotal) sTotal.textContent = `₹${total.toFixed(2)}`;
+    } else {
+      stickyBar.classList.remove('visible');
+    }
+  }
 }
 
 function changeQty(productId, delta) {
