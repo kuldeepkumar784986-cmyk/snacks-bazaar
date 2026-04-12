@@ -74,11 +74,29 @@ function updateCartUI() {
       const sCount = document.getElementById('stickyCartCount');
       const sTotal = document.getElementById('stickyCartTotal');
       if (sCount) sCount.textContent = `${totalQty} item${totalQty > 1 ? 's' : ''}`;
-      if (sTotal) sTotal.textContent = `₹${total.toFixed(2)}`;
+      if (sTotal) sTotal.textContent = `\u20b9${total.toFixed(2)}`;
     } else {
       stickyBar.classList.remove('visible');
     }
   }
+
+  // Free delivery progress bar (₹299 threshold)
+  const FREE_THRESHOLD = 299;
+  const progressEl = document.getElementById('cartProgressWrap');
+  if (progressEl) {
+    const remaining = Math.max(0, FREE_THRESHOLD - total);
+    const pct = Math.min(100, (total / FREE_THRESHOLD) * 100);
+    if (total >= FREE_THRESHOLD) {
+      progressEl.innerHTML = `<div class="cart-progress"><div class="cart-progress__label" style="color:#16a34a;">🎉 You unlocked <span>FREE Delivery!</span></div><div class="cart-progress__bar-bg"><div class="cart-progress__bar-fill" style="width:100%;"></div></div></div>`;
+    } else {
+      progressEl.innerHTML = `<div class="cart-progress"><div class="cart-progress__label">Add <span>\u20b9${remaining.toFixed(0)}</span> more for FREE delivery</div><div class="cart-progress__bar-bg"><div class="cart-progress__bar-fill" style="width:${pct.toFixed(1)}%;"></div></div></div>`;
+    }
+  }
+
+  // Update bottom nav cart badge
+  document.querySelectorAll('.bn-cart-count').forEach(el => {
+    el.dataset.count = totalQty;
+  });
 }
 
 function changeQty(productId, delta) {

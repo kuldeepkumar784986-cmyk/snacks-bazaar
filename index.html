@@ -95,6 +95,27 @@
     <div class="trust-badge"><span class="tb-icon">⭐</span> 10K+ Happy Customers</div>
   </div>
 
+
+  <!-- Customer Reviews Marquee Strip -->
+  <div class="reviews-marquee" aria-label="Customer reviews">
+    <div class="reviews-marquee__track">
+      <!-- Set 1 -->
+      <div class="review-chip"><span class="review-chip__stars">★★★★★</span><span class="review-chip__text">"Best Kurkure delivery ever!"</span><span class="review-chip__name">— Priya S.</span></div>
+      <div class="review-chip"><span class="review-chip__stars">★★★★★</span><span class="review-chip__text">"Haldiram's arrived in 8 mins 🤯"</span><span class="review-chip__name">— Rahul M.</span></div>
+      <div class="review-chip"><span class="review-chip__stars">★★★★★</span><span class="review-chip__text">"Freshest snacks I've ordered online!"</span><span class="review-chip__name">— Sneha K.</span></div>
+      <div class="review-chip"><span class="review-chip__stars">★★★★★</span><span class="review-chip__text">"Love the variety — 60+ snacks!"</span><span class="review-chip__name">— Arjun T.</span></div>
+      <div class="review-chip"><span class="review-chip__stars">★★★★★</span><span class="review-chip__text">"Packaging is perfect, no crushed chips!"</span><span class="review-chip__name">— Ananya R.</span></div>
+      <div class="review-chip"><span class="review-chip__stars">★★★★★</span><span class="review-chip__text">"My go-to for midnight cravings 😋"</span><span class="review-chip__name">— Karan P.</span></div>
+      <!-- Set 2 (duplicate for seamless loop) -->
+      <div class="review-chip"><span class="review-chip__stars">★★★★★</span><span class="review-chip__text">"Best Kurkure delivery ever!"</span><span class="review-chip__name">— Priya S.</span></div>
+      <div class="review-chip"><span class="review-chip__stars">★★★★★</span><span class="review-chip__text">"Haldiram's arrived in 8 mins 🤯"</span><span class="review-chip__name">— Rahul M.</span></div>
+      <div class="review-chip"><span class="review-chip__stars">★★★★★</span><span class="review-chip__text">"Freshest snacks I've ordered online!"</span><span class="review-chip__name">— Sneha K.</span></div>
+      <div class="review-chip"><span class="review-chip__stars">★★★★★</span><span class="review-chip__text">"Love the variety — 60+ snacks!"</span><span class="review-chip__name">— Arjun T.</span></div>
+      <div class="review-chip"><span class="review-chip__stars">★★★★★</span><span class="review-chip__text">"Packaging is perfect, no crushed chips!"</span><span class="review-chip__name">— Ananya R.</span></div>
+      <div class="review-chip"><span class="review-chip__stars">★★★★★</span><span class="review-chip__text">"My go-to for midnight cravings 😋"</span><span class="review-chip__name">— Karan P.</span></div>
+    </div>
+  </div>
+
   <!-- Press Quote Bar -->
   <section class="press-bar reveal">
     <blockquote class="press-bar__quote">
@@ -347,6 +368,7 @@
       <h3>YOUR CART</h3>
       <button onclick="closeCart()">✕</button>
     </div>
+    <div id="cartProgressWrap"></div>
     <div class="cart-drawer__items" id="cartItems">
       <!-- Dynamic items injected here -->
     </div>
@@ -366,6 +388,50 @@
   <script src="/js/carousel.js"></script>
   <script src="/js/animations.js"></script>
   <script src="/js/stepper.js"></script>
+
+  <!-- WhatsApp Float Button -->
+  <a href="https://wa.me/917849861219" target="_blank" rel="noopener"
+     class="whatsapp-float" aria-label="Chat on WhatsApp" title="Chat with us on WhatsApp">
+    💬
+  </a>
+
+  <!-- Bottom Mobile Navigation -->
+  <nav class="bottom-nav" aria-label="Mobile navigation">
+    <div class="bottom-nav__items">
+      <a href="/index.html" class="bottom-nav__item active">
+        <span class="bottom-nav__icon">🏠</span>Home
+      </a>
+      <a href="/shop.html" class="bottom-nav__item ">
+        <span class="bottom-nav__icon">🛍️</span>Shop
+      </a>
+      <a href="#" onclick="openCart(); return false;" class="bottom-nav__item">
+        <span class="bottom-nav__icon bn-cart-count" data-count="0">🛒</span>Cart
+      </a>
+      <a href="/account.html" class="bottom-nav__item">
+        <span class="bottom-nav__icon">👤</span>Account
+      </a>
+    </div>
+  </nav>
+
+  <!-- Floating Snack Emoji Confetti -->
+  <div class="emoji-float-layer" aria-hidden="true" id="emojiLayer"></div>
+  <script>
+    (function(){
+      const emojis = ['🍿','🌶️','🥨','🍟','🍩','🧂','🫙'];
+      const layer  = document.getElementById('emojiLayer');
+      if (!layer) return;
+      emojis.forEach((e, i) => {
+        const el = document.createElement('span');
+        el.className = 'emoji-float';
+        el.textContent = e;
+        el.style.left = (8 + i * 13) + '%';
+        el.style.animationDuration = (14 + i * 3) + 's';
+        el.style.animationDelay    = (i * 2.5) + 's';
+        el.style.fontSize           = (1.2 + (i % 3) * 0.4) + 'rem';
+        layer.appendChild(el);
+      });
+    })();
+  </script>
 </body>
 </html>
 

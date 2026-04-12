@@ -409,6 +409,7 @@
       <h3>YOUR CART</h3>
       <button onclick="closeCart()">✕</button>
     </div>
+    <div id="cartProgressWrap"></div>
     <div class="cart-drawer__items" id="cartItems"></div>
     <div class="cart-drawer__footer">
       <div class="cart-subtotal">
@@ -476,5 +477,29 @@
   <script src="/js/animations.js"></script>
   <script src="/js/stepper.js"></script>
   <script src="/js/reviews.js"></script>
+
+  <!-- WhatsApp Float Button -->
+  <a href="https://wa.me/917849861219" target="_blank" rel="noopener"
+     class="whatsapp-float" aria-label="Chat on WhatsApp" title="Chat with us on WhatsApp">
+    💬
+  </a>
+
+  <!-- Bottom Mobile Navigation -->
+  <nav class="bottom-nav" aria-label="Mobile navigation">
+    <div class="bottom-nav__items">
+      <a href="/index.html" class="bottom-nav__item ">
+        <span class="bottom-nav__icon">🏠</span>Home
+      </a>
+      <a href="/shop.html" class="bottom-nav__item active">
+        <span class="bottom-nav__icon">🛍️</span>Shop
+      </a>
+      <a href="#" onclick="openCart(); return false;" class="bottom-nav__item">
+        <span class="bottom-nav__icon bn-cart-count" data-count="0">🛒</span>Cart
+      </a>
+      <a href="/account.html" class="bottom-nav__item">
+        <span class="bottom-nav__icon">👤</span>Account
+      </a>
+    </div>
+  </nav>
 </body>
 </html>
