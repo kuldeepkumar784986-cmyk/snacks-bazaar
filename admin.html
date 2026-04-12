@@ -342,37 +342,37 @@
         if (p.stock === 0) stockColor = '#dc2626'; // red
         else if (p.stock <= 10) stockColor = '#d97706'; // orange
         
-        let stockBadge = p.stock === 0 ? \`<br><span class="badge" style="background:#ffe4e6; color:#e11d48; margin-top:4px;">OUT OF STOCK</span>\` : '';
+        let stockBadge = p.stock === 0 ? `<br><span class="badge" style="background:#ffe4e6; color:#e11d48; margin-top:4px;">OUT OF STOCK</span>` : '';
         
         let toggleBtn = p.stock === 0 
-          ? \`<button class="btn-save show" style="background:#16a34a;" onclick="toggleStock(\${p.productId}, 100)">Mark In Stock</button>\`
-          : \`<button class="btn-save show" style="background:#e11d48;" onclick="toggleStock(\${p.productId}, 0)">Mark Out of Stock</button>\`;
+          ? `<button class="btn-save show" style="background:#16a34a;" onclick="toggleStock(${p.productId}, 100)">Mark In Stock</button>`
+          : `<button class="btn-save show" style="background:#e11d48;" onclick="toggleStock(${p.productId}, 0)">Mark Out of Stock</button>`;
           
-        html += \`
+        html += `
           <tr>
             <td>
               <div style="display:flex; align-items:center; gap:10px;">
-                <img src="\${p.image || '/images/default-snack.png'}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;background:#eee;">
-                <strong>\${p.name}</strong>
+                <img src="${p.image || '/images/default-snack.png'}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;background:#eee;">
+                <strong>${p.name}</strong>
               </div>
             </td>
-            <td><span style="text-transform:uppercase; font-size:0.8rem; color:#888;">\${p.category}</span></td>
-            <td>₹\${p.price.toFixed(2)}</td>
+            <td><span style="text-transform:uppercase; font-size:0.8rem; color:#888;">${p.category}</span></td>
+            <td>₹${p.price.toFixed(2)}</td>
             <td>
-              <strong style="color:\${stockColor}; font-size:1.1rem;">\${p.stock}</strong>
-              \${stockBadge}
+              <strong style="color:${stockColor}; font-size:1.1rem;">${p.stock}</strong>
+              ${stockBadge}
             </td>
-            <td>\${toggleBtn}</td>
+            <td>${toggleBtn}</td>
           </tr>
-        \`;
+        `;
       });
-      html += \`</tbody></table>\`;
+      html += `</tbody></table>`;
       document.getElementById('productsContainer').innerHTML = html;
     }
 
     async function toggleStock(productId, newStock) {
       try {
-        const res = await fetch(\`\${API_BASE}/products/\${productId}\`, {
+        const res = await fetch(`${API_BASE}/products/${productId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ stock: newStock })
