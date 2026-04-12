@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snack Bazaar | Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <style>
+    body { background: var(--color-off-white); font-family: var(--font-body); margin: 0; padding: 0; }
+    
+    /* ── Login Overlay ── */
+    #loginOverlay {
+      position: fixed; inset: 0; background: var(--color-purple-deep);
+      display: flex; align-items: center; justify-content: center; z-index: 9999;
+    }
+    .login-box {
+      background: white; padding: 3rem; border-radius: 20px;
+      width: 100%; max-width: 400px; text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .login-box h1 { font-family: var(--font-display); color: var(--color-purple-deep); font-size: 2.5rem; margin-bottom: 1.5rem; }
+    .auth-input {
+      width: 100%; padding: 0.8rem; margin-bottom: 1rem;
+      border: 2px solid #eee; border-radius: 10px; font-family: var(--font-body); font-size: 1rem;
+    }
+    .auth-input:focus { outline: none; border-color: var(--color-purple-mid); }
+    .btn-login {
+      width: 100%; padding: 1rem; background: var(--color-pink-hot); color: white;
+      font-family: var(--font-display); font-size: 1.25rem; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s;
+    }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255, 94, 138, 0.4); }
+
+    /* ── Dashboard Base ── */
+    #dashboard { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+    .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.5rem; }
+    .dash-header h1 { font-size: 3rem; color: var(--color-purple-deep); margin: 0; line-height: 1; }
+    .btn-logout { background: var(--color-purple-light); color: var(--color-purple-deep); border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-family: var(--font-accent); font-weight: 700; font-size: 0.8rem; }
+
+    /* ── Stats ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .stat-label { font-family: var(--font-accent); font-size: 0.8rem; color: #888; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .stat-value { font-family: var(--font-display); font-size: 2.5rem; color: var(--color-purple-deep); line-height: 1; }
+
+    /* ── Orders Table ── */
+    .table-card { background: white; border-radius: 12px; padding: 1.5rem; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow-x: auto; }
+    .table-title { font-family: var(--font-display); font-size: 1.5rem; color: var(--color-dark-text); margin-bottom: 1rem; }
+    table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    th { text-align: left; padding: 1rem; border-bottom: 2px solid #f0f0f0; font-family: var(--font-accent); font-size: 0.75rem; color: #888; }
+    td { padding: 1.25rem 1rem; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    
+    .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 6px; font-family: var(--font-accent); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+    .badge-cod { background: #ffe4e6; color: #e11d48; }
+    .badge-paid { background: #dcfce7; color: #16a34a; }
+    .badge-pending { background: #fef08a; color: #854d0e; }
+    
+    .status-select { padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid #ddd; font-family: var(--font-body); font-size: 0.85rem; font-weight: 600; cursor: pointer; outline: none; background: #fafafa; }
+    .status-select:hover { border-color: var(--color-purple-deep); }
+    .status-pending { color: #d97706; }
+    .status-shipped { color: #3b82f6; }
+    .status-delivered { color: #16a34a; }
+    .status-cancelled { color: #dc2626; }
+
+    .btn-save { background: var(--color-purple-mid); color: white; border: none; border-radius: 8px; padding: 0.4rem 0.8rem; font-family: var(--font-body); font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; opacity: 0; pointer-events: none; margin-left: 0.5rem; }
+    .btn-save.show { opacity: 1; pointer-events: all; }
+    .btn-save:hover { background: var(--color-purple-deep); }
+    
+    .loading { text-align: center; padding: 3rem; font-size: 1.2rem; color: #888; font-family: var(--font-accent); }
+    
+    .customer-info { display: flex; flex-direction: column; gap: 4px; }
+    .item-list { font-size: 0.8rem; color: #666; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- ADMIN LOGIN -->
+  <div id="loginOverlay">
+    <div class="login-box">
+      <h1>ADMIN PORTAL</h1>
+      <form id="loginForm">
+        <input type="text" id="username" class="auth-input" placeholder="Username (admin)" required>
+        <input type="password" id="password" class="auth-input" placeholder="Password" required>
+        <button type="submit" class="btn-login">SECURE LOGIN</button>
+      </form>
+      <p id="loginError" style="color: #e11d48; font-size: 0.85rem; margin-top: 1rem; display: none;">Invalid credentials. Please try again.</p>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+    <div class="dash-header">
+      <h1>HQ COMMAND CENTER</h1>
+      <button class="btn-logout" onclick="logout()">LOGOUT</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value" id="statOrders">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Revenue (COD + Online)</div>
+        <div class="stat-value" id="statRevenue">₹0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending Shipments</div>
+        <div class="stat-value" id="statPending">--</div>
+      </div>
+    </div>
+
+    <!-- Orders -->
+    <div class="table-card">
+      <h2 class="table-title">Recent Orders</h2>
+      <div id="ordersContainer">
+        <div class="loading">Loading live data from Railway API... 📡</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://snacks-bazaar-production.up.railway.app/api';
+    let allOrders = [];
+
+    // ── AUTHENTICATION ──
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      
+      if (u === 'admin' && p === 'snackbazaar2024') {
+        sessionStorage.setItem('adminToken', 'granted');
+        showDashboard();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    });
+
+    if (sessionStorage.getItem('adminToken') === 'granted') {
+      showDashboard();
+    }
+
+    function showDashboard() {
+      document.getElementById('loginOverlay').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      fetchOrders();
+    }
+
+    function logout() {
+      sessionStorage.removeItem('adminToken');
+      window.location.reload();
+    }
+
+    // ── FETCH ORDERS ──
+    async function fetchOrders() {
+      try {
+        const res = await fetch(`${API_BASE}/orders?limit=100`);
+        const json = await res.json();
+        
+        if (json.success) {
+          allOrders = json.data;
+          renderDashboard(json.data);
+        } else {
+          document.getElementById('ordersContainer').innerHTML = `<p style="color:red">Error: ${json.message}</p>`;
+        }
+      } catch (err) {
+        document.getElementById('ordersContainer').innerHTML = `<p style="color:red">Failed to connect to backend: ${err.message}</p>`;
+      }
+    }
+
+    // ── RENDER ──
+    function renderDashboard(orders) {
+      // Calc Stats
+      const totalRev = orders.reduce((s, o) => s + (o.deliveryStatus !== 'cancelled' ? o.amount : 0), 0);
+      const pendingCount = orders.filter(o => o.deliveryStatus === 'pending' || o.deliveryStatus === 'confirmed').length;
+
+      document.getElementById('statOrders').textContent = orders.length;
+      document.getElementById('statRevenue').textContent = `₹${totalRev.toLocaleString()}`;
+      document.getElementById('statPending').textContent = pendingCount;
+
+      // Table
+      if (orders.length === 0) {
+        document.getElementById('ordersContainer').innerHTML = '<div class="loading">No orders yet! Share your shop link to get sales.</div>';
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>ORDER ID</th>
+              <th>CUSTOMER</th>
+              <th>AMOUNT (PAYMENT)</th>
+              <th>ITEMS</th>
+              <th>DELIVERY STATUS</th>
+              <th>DATE</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      orders.forEach(o => {
+        const payBadge = o.paymentStatus === 'paid' ? 'badge-paid' : 'badge-pending';
+        const methodBadge = o.paymentMethod === 'COD' ? 'badge-cod' : 'badge-paid';
+        const itemsList = o.items.map(i => `${i.qty}× ${i.name}`).join(', ');
+        const date = new Date(o.createdAt).toLocaleString('en-IN', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+
+        html += `
+          <tr>
+            <td style="font-family:var(--font-accent); font-weight:700;">${o.orderId}</td>
+            <td>
+              <div class="customer-info">
+                <strong>${o.customer.name || 'Guest'}</strong>
+                <span style="font-size:0.8rem;color:#888;">${o.customer.phone || 'No phone'}</span>
+                <span style="font-size:0.8rem;color:#888;max-width:200px;">${o.customer.address}</span>
+              </div>
+            </td>
+            <td>
+              <strong>₹${o.amount.toFixed(2)}</strong><br>
+              <span class="badge ${methodBadge}" style="margin-top:6px;">${o.paymentMethod || 'Online'}</span>
+              <span class="badge ${payBadge}" style="margin-top:6px;">${o.paymentStatus}</span>
+            </td>
+            <td style="max-width:250px;">
+              <div class="item-list">${itemsList}</div>
+            </td>
+            <td>
+              <div style="display:flex; align-items:center;">
+                <select class="status-select status-${o.deliveryStatus}" onchange="showSaveBtn('${o.orderId}')" id="status-${o.orderId}">
+                  <option value="pending" ${o.deliveryStatus === 'pending' ? 'selected' : ''}>Pending</option>
+                  <option value="confirmed" ${o.deliveryStatus === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                  <option value="shipped" ${o.deliveryStatus === 'shipped' ? 'selected' : ''}>Shipped</option>
+                  <option value="out_for_delivery" ${o.deliveryStatus === 'out_for_delivery' ? 'selected' : ''}>Out for Delivery</option>
+                  <option value="delivered" ${o.deliveryStatus === 'delivered' ? 'selected' : ''}>Delivered</option>
+                  <option value="cancelled" ${o.deliveryStatus === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                </select>
+                <button class="btn-save" id="btn-${o.orderId}" onclick="updateStatus('${o.orderId}', '${o._id}')">SAVE</button>
+              </div>
+            </td>
+            <td style="color:#888; font-size:0.8rem;">${date}</td>
+          </tr>
+        `;
+      });
+      
+      html += `</tbody></table>`;
+      document.getElementById('ordersContainer').innerHTML = html;
+    }
+
+    // ── UPDATE STATUS ──
+    function showSaveBtn(orderId) {
+      document.getElementById(`btn-${orderId}`).classList.add('show');
+    }
+
+    async function updateStatus(customId, objectId) {
+      const select = document.getElementById(`status-${customId}`);
+      const btn = document.getElementById(`btn-${customId}`);
+      const newStatus = select.value;
+
+      btn.textContent = '...';
+      btn.style.opacity = '0.7';
+
+      try {
+        // If cancelled, call special cancel endpoint to restore stock
+        const endpoint = newStatus === 'cancelled' 
+          ? `${API_BASE}/orders/${customId}/cancel`
+          : `${API_BASE}/orders/${customId}/status`;
+
+        const method = newStatus === 'cancelled' ? 'PUT' : 'PUT';
+        const body = newStatus === 'cancelled' ? null : JSON.stringify({ status: newStatus });
+
+        const res = await fetch(endpoint, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          btn.textContent = 'SAVED ✓';
+          setTimeout(() => { btn.classList.remove('show'); btn.textContent = 'SAVE'; }, 1500);
+          // Refetch to reflect any paymentStatus changes (e.g. Delivered -> Paid)
+          fetchOrders();
+        } else {
+          alert('Error: ' + data.message);
+          btn.textContent = 'ERROR';
+        }
+      } catch (err) {
+        alert('Failed: ' + err.message);
+        btn.textContent = 'SAVE';
+      }
+    }
+  </script>
+</body>
+</html>
