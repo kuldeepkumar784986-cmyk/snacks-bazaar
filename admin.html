@@ -82,6 +82,46 @@
     
     .loading-pane { text-align: center; padding: 4rem; color: #888; font-family: var(--font-accent); font-size: 1.2rem; }
 
+    /* ── Out of Stock Badge ── */
+    .oos-badge {
+      display: inline-block; padding: 0.3rem 0.7rem; border-radius: 6px;
+      background: #dc2626; color: white; font-family: var(--font-accent);
+      font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.5px; animation: oosPulse 2s ease-in-out infinite;
+    }
+    @keyframes oosPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* ── Stock Toggle Button ── */
+    .btn-stock-toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0.5rem 1rem; border: none; border-radius: 8px;
+      font-family: var(--font-body); font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s ease; white-space: nowrap;
+    }
+    .btn-stock-toggle:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .btn-stock-toggle:active { transform: translateY(0); }
+    .btn-stock-toggle.mark-oos {
+      background: #fef2f2; color: #dc2626; border: 1.5px solid #fca5a5;
+    }
+    .btn-stock-toggle.mark-oos:hover { background: #fee2e2; }
+    .btn-stock-toggle.mark-instock {
+      background: #f0fdf4; color: #16a34a; border: 1.5px solid #86efac;
+    }
+    .btn-stock-toggle.mark-instock:hover { background: #dcfce7; }
+    .btn-stock-toggle:disabled {
+      opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important;
+    }
+
+    /* ── Stock Cell ── */
+    .stock-cell { display: flex; flex-direction: column; gap: 4px; }
+    .stock-count { font-family: var(--font-display); font-size: 1.2rem; line-height: 1; }
+    .stock-count.stock-green { color: #16a34a; }
+    .stock-count.stock-orange { color: #d97706; }
+    .stock-count.stock-red { color: #dc2626; }
+
     /* ── Modal ── */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; pointer-events: none; transition: 0.2s; }
     .modal-overlay.active { opacity: 1; pointer-events: all; }
@@ -477,15 +517,37 @@
       let html = `<table><thead><tr><th>ITEM</th><th>CATEGORY</th><th>PRICE</th><th>STOCK</th><th>ACTION</th></tr></thead><tbody>`;
       
       state.products.forEach(p => {
-        let stockColor = p.stock === 0 ? '#dc2626' : (p.stock <= 10 ? '#d97706' : '#16a34a');
-        let badge = p.stock === 0 ? `<br><span class="badge" style="background:#ffe4e6; color:#e11d48; margin-top:4px;">OUT OF STOCK</span>` : '';
-        
-        let toggle = p.stock === 0 
-          ? `<button class="btn-save show" style="background:#16a34a;" onclick="updateProductStock(${p.productId}, 100)">Restock</button>`
-          : `<button class="btn-save show" style="background:#e11d48;" onclick="updateProductStock(${p.productId}, 0)">Deplete</button>`;
+        // Stock color class
+        let stockClass = p.stock === 0 ? 'stock-red' : (p.stock <= 10 ? 'stock-orange' : 'stock-green');
+
+        // Stock cell content
+        let stockCell;
+        if (p.stock === 0) {
+          stockCell = `<div class="stock-cell">
+            <span class="oos-badge">OUT OF STOCK</span>
+          </div>`;
+        } else {
+          let stockLabel = p.stock <= 10 ? `<span style="font-size:0.7rem; color:#d97706; font-family:var(--font-accent);">LOW STOCK</span>` : '';
+          stockCell = `<div class="stock-cell">
+            <span class="stock-count ${stockClass}">${p.stock}</span>
+            ${stockLabel}
+          </div>`;
+        }
+
+        // Toggle button
+        let toggleBtn;
+        if (p.stock === 0) {
+          toggleBtn = `<button class="btn-stock-toggle mark-instock" id="toggle-${p.productId}" onclick="updateProductStock(${p.productId}, 100, this)">
+            ✅ Mark In Stock
+          </button>`;
+        } else {
+          toggleBtn = `<button class="btn-stock-toggle mark-oos" id="toggle-${p.productId}" onclick="updateProductStock(${p.productId}, 0, this)">
+            🚫 Mark Out of Stock
+          </button>`;
+        }
           
         html += `
-          <tr>
+          <tr${p.stock === 0 ? ' style="background:#fef2f2;"' : ''}>
             <td>
               <div style="display:flex; align-items:center; gap:10px;">
                 <img src="${p.image || '/images/default-snack.png'}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;background:#eee;">
@@ -494,8 +556,8 @@
             </td>
             <td><span style="text-transform:uppercase; font-size:0.8rem; color:#888;">${p.category}</span></td>
             <td>₹${p.price.toFixed(2)}</td>
-            <td><strong style="color:${stockColor}; font-size:1.1rem;">${p.stock}</strong>${badge}</td>
-            <td>${toggle}</td>
+            <td>${stockCell}</td>
+            <td>${toggleBtn}</td>
           </tr>
         `;
       });
@@ -503,15 +565,29 @@
       document.getElementById('productsTableBox').innerHTML = html;
     }
 
-    async function updateProductStock(id, newStock) {
+    async function updateProductStock(id, newStock, btnEl) {
+      // Disable button and show loading state
+      if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.textContent = newStock === 0 ? '⏳ Marking OOS...' : '⏳ Restocking...';
+      }
       try {
         const res = await fetch(`${API_BASE}/products/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ stock: newStock })
         });
-        if((await res.json()).success) fetchBackendData();
-      } catch (e) { alert("Failed stock sync"); }
+        const data = await res.json();
+        if (data.success) {
+          fetchBackendData(); // refresh all UI
+        } else {
+          alert('Failed to update stock: ' + (data.message || 'Unknown error'));
+          if (btnEl) { btnEl.disabled = false; btnEl.textContent = newStock === 0 ? '🚫 Mark Out of Stock' : '✅ Mark In Stock'; }
+        }
+      } catch (e) {
+        alert('Failed to sync stock — check your connection.');
+        if (btnEl) { btnEl.disabled = false; btnEl.textContent = newStock === 0 ? '🚫 Mark Out of Stock' : '✅ Mark In Stock'; }
+      }
     }
 
 

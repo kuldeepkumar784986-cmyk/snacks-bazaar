@@ -1,2 +1,3 @@
 # Local Netlify folder
 .netlify
+bakend/node_modules/

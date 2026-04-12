@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account — Snack Bazaar</title>
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/footer.css">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#fff9f0;color:#1a1a1a}
+
+    /* ── Auth Card ── */
+    .auth-wrapper{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:40px 16px}
+    .auth-card{background:#fff;border-radius:16px;box-shadow:0 4px 30px rgba(0,0,0,.08);width:100%;max-width:420px;overflow:hidden}
+    .auth-header{background:linear-gradient(135deg,#e85d04,#f48c06);padding:28px;text-align:center}
+    .auth-header h1{color:#fff;font-size:22px;letter-spacing:1px}
+    .auth-header p{color:#ffe8cc;font-size:13px;margin-top:4px}
+    .auth-tabs{display:flex;border-bottom:2px solid #f0e6d3}
+    .auth-tab{flex:1;padding:14px;text-align:center;cursor:pointer;font-size:14px;font-weight:600;color:#888;background:none;border:none;transition:.2s}
+    .auth-tab.active{color:#e85d04;border-bottom:2px solid #e85d04;margin-bottom:-2px}
+    .auth-body{padding:28px}
+    .auth-form{display:none}
+    .auth-form.active{display:block}
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+    .form-group input{width:100%;padding:12px 14px;border:1.5px solid #e0d5c8;border-radius:8px;font-size:14px;outline:none;transition:.2s}
+    .form-group input:focus{border-color:#e85d04}
+    .btn-auth{width:100%;padding:14px;background:linear-gradient(135deg,#e85d04,#f48c06);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:1px;margin-top:8px;transition:.2s}
+    .btn-auth:hover{opacity:.9}
+    .msg-error{background:#fff0f0;border:1px solid #ffcccc;color:#c0392b;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
+    .msg-success{background:#f0fff4;border:1px solid #c3e6cb;color:#1e7e34;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
+
+    /* ── Dashboard ── */
+    .dashboard{display:none;max-width:900px;width:100%;margin:0 auto;padding:30px 16px}
+    .dash-header{background:#fff;border-radius:16px;padding:24px 28px;margin-bottom:20px;box-shadow:0 2px 15px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .dash-header h2{font-size:20px}
+    .dash-header p{color:#888;font-size:13px;margin-top:2px}
+    .btn-logout{background:#1a1a1a;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600}
+
+    /* ── Tabs ── */
+    .dash-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+    .dash-tab{padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:600;background:#fff;color:#555;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:.2s}
+    .dash-tab.active{background:#e85d04;color:#fff}
+
+    .dash-panel{display:none}
+    .dash-panel.active{display:block}
+
+    /* ── Orders ── */
+    .order-card{background:#fff;border-radius:12px;padding:20px 24px;margin-bottom:16px;box-shadow:0 2px 15px rgba(0,0,0,.06)}
+    .order-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+    .order-id{font-size:18px;font-weight:700;color:#e85d04}
+    .order-date{font-size:12px;color:#888;margin-top:2px}
+    .badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;text-transform:uppercase}
+    .badge-placed{background:#fff4e6;color:#e85d04}
+    .badge-confirmed{background:#e8f4fd;color:#1976d2}
+    .badge-shipped{background:#e8f5e9;color:#388e3c}
+    .badge-delivered{background:#e8f5e9;color:#2e7d32}
+    .badge-cancelled{background:#fce4ec;color:#c62828}
+    .badge-pending{background:#fff4e6;color:#e85d04}
+    .order-items{border-top:1px solid #f0e6d3;padding-top:14px}
+    .order-item{display:flex;justify-content:space-between;font-size:14px;padding:4px 0;color:#444}
+    .order-total{display:flex;justify-content:space-between;font-weight:700;font-size:15px;border-top:1px solid #f0e6d3;margin-top:10px;padding-top:10px}
+    .order-total span:last-child{color:#e85d04}
+    .order-addr{margin-top:12px;font-size:13px;color:#888;background:#f8f8f8;padding:8px 12px;border-radius:6px}
+
+    /* ── Profile ── */
+    .profile-card{background:#fff;border-radius:12px;padding:28px;box-shadow:0 2px 15px rgba(0,0,0,.06);margin-bottom:16px}
+    .profile-card h3{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:20px}
+    .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:500px){.profile-grid{grid-template-columns:1fr}}
+    .btn-save{background:#e85d04;color:#fff;border:none;padding:12px 28px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px;margin-top:8px}
+    .btn-save:hover{opacity:.9}
+
+    /* ── Wishlist ── */
+    .wishlist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+    .wish-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+    .wish-img{width:100%;aspect-ratio:1;object-fit:cover;background:#f8f8f8}
+    .wish-body{padding:12px}
+    .wish-name{font-size:13px;font-weight:600;margin-bottom:4px}
+    .wish-price{font-size:14px;color:#e85d04;font-weight:700}
+    .btn-remove{background:#fce4ec;color:#c62828;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;margin-top:8px;font-weight:600;width:100%}
+
+    /* ── Empty states ── */
+    .empty{text-align:center;padding:60px 20px;background:#fff;border-radius:12px;box-shadow:0 2px 15px rgba(0,0,0,.06)}
+    .empty p{font-size:40px;margin-bottom:12px}
+    .empty h3{color:#1a1a1a;margin-bottom:8px}
+    .empty span{color:#888;font-size:14px}
+    .empty a{display:inline-block;margin-top:16px;background:#e85d04;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px}
+
+    .loading{text-align:center;padding:40px;color:#888}
+    .section-msg{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none}
+    .section-msg.error{background:#fff0f0;border:1px solid #ffcccc;color:#c0392b}
+    .section-msg.success{background:#f0fff4;border:1px solid #c3e6cb;color:#1e7e34}
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav__logo">🍿 SNACK BAZAAR</div>
+  <ul class="nav__links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html">Shop</a></li>
+    <li><a href="account.html" style="color:#e85d04">My Account</a></li>
+  </ul>
+</nav>
+
+<!-- ── AUTH (logged out) ── -->
+<div class="auth-wrapper" id="authWrapper">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>🍿 MY ACCOUNT</h1>
+      <p>Login to manage your orders & profile</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Login</button>
+      <button class="auth-tab" onclick="switchTab('register')">Register</button>
+    </div>
+    <div class="auth-body">
+      <!-- LOGIN -->
+      <div class="auth-form active" id="loginForm">
+        <div class="msg-error" id="loginErr"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="your@email.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="loginPwd" placeholder="Your password"></div>
+        <button class="btn-auth" onclick="handleLogin()">LOGIN →</button>
+      </div>
+      <!-- REGISTER -->
+      <div class="auth-form" id="registerForm">
+        <div class="msg-error" id="regErr"></div>
+        <div class="msg-success" id="regOk"></div>
+        <div class="form-group"><label>Full Name</label><input type="text" id="regName" placeholder="Kuldeep Kumar"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="your@email.com"></div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="regPhone" placeholder="9876543210"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="regPwd" placeholder="Min 6 characters"></div>
+        <button class="btn-auth" onclick="handleRegister()">CREATE ACCOUNT →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DASHBOARD (logged in) ── -->
+<div class="dashboard" id="dashboard">
+  <div class="dash-header">
+    <div>
+      <h2 id="dashName">Welcome! 👋</h2>
+      <p id="dashEmail"></p>
+    </div>
+    <button class="btn-logout" onclick="handleLogout()">Logout</button>
+  </div>
+
+  <div class="dash-tabs">
+    <button class="dash-tab active" onclick="showPanel('orders')">📦 My Orders</button>
+    <button class="dash-tab" onclick="showPanel('wishlist')">❤️ Wishlist</button>
+    <button class="dash-tab" onclick="showPanel('address')">📍 Saved Address</button>
+    <button class="dash-tab" onclick="showPanel('profile')">👤 Profile</button>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="dash-panel active" id="panel-orders">
+    <div id="ordersList"><div class="loading">Loading orders...</div></div>
+  </div>
+
+  <!-- WISHLIST -->
+  <div class="dash-panel" id="panel-wishlist">
+    <div id="wishlistGrid"><div class="loading">Loading wishlist...</div></div>
+  </div>
+
+  <!-- ADDRESS -->
+  <div class="dash-panel" id="panel-address">
+    <div class="profile-card">
+      <h3>📍 Saved Delivery Address</h3>
+      <div class="section-msg" id="addrMsg"></div>
+      <div class="profile-grid">
+        <div class="form-group" style="grid-column:1/-1"><label>Street / House No.</label><input type="text" id="addrLine1" placeholder="Flat 302, Sunshine Apartments"></div>
+        <div class="form-group"><label>City</label><input type="text" id="addrCity" placeholder="Aurangabad"></div>
+        <div class="form-group"><label>State</label><input type="text" id="addrState" placeholder="Maharashtra"></div>
+        <div class="form-group"><label>Pincode</label><input type="text" id="addrPin" placeholder="431001"></div>
+      </div>
+      <button class="btn-save" onclick="saveAddress()">SAVE ADDRESS</button>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="dash-panel" id="panel-profile">
+    <div class="profile-card">
+      <h3>👤 Personal Info</h3>
+      <div class="section-msg" id="profileMsg"></div>
+      <div class="profile-grid">
+        <div class="form-group"><label>Full Name</label><input type="text" id="profName"></div>
+        <div class="form-group"><label>Phone</label><input type="text" id="profPhone"></div>
+        <div class="form-group" style="grid-column:1/-1"><label>Email (cannot change)</label><input type="email" id="profEmail" disabled style="opacity:.6"></div>
+      </div>
+      <button class="btn-save" onclick="saveProfile()">SAVE CHANGES</button>
+    </div>
+
+    <div class="profile-card">
+      <h3>🔒 Change Password</h3>
+      <div class="section-msg" id="pwdMsg"></div>
+      <div class="form-group"><label>Current Password</label><input type="password" id="curPwd"></div>
+      <div class="form-group"><label>New Password</label><input type="password" id="newPwd"></div>
+      <button class="btn-save" onclick="changePassword()">CHANGE PASSWORD</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://snacks-bazaar-production.up.railway.app/api';
+let TOKEN = null;
+
+// ── Init ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  TOKEN = localStorage.getItem('sb_token');
+  const c = JSON.parse(localStorage.getItem('sb_customer') || 'null');
+  if (TOKEN && c) showDashboard(c);
+});
+
+// ── Tab switch (auth) ─────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='register'&&i===1)));
+  document.getElementById('loginForm').classList.toggle('active', tab==='login');
+  document.getElementById('registerForm').classList.toggle('active', tab==='register');
+}
+
+// ── Login ─────────────────────────────────────────────────────
+async function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pwd   = document.getElementById('loginPwd').value.trim();
+  const err   = document.getElementById('loginErr');
+  err.style.display='none';
+  if(!email||!pwd){showMsg(err,'Please fill in all fields','error');return;}
+  try {
+    const res  = await fetch(`${API}/customers/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pwd})});
+    const data = await res.json();
+    if(!data.success){showMsg(err,data.message,'error');return;}
+    TOKEN = data.token;
+    localStorage.setItem('sb_token', TOKEN);
+    localStorage.setItem('sb_customer', JSON.stringify(data.customer));
+    showDashboard(data.customer);
+  } catch { showMsg(err,'Connection error. Try again.','error'); }
+}
+
+// ── Register ──────────────────────────────────────────────────
+async function handleRegister() {
+  const name  = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const pwd   = document.getElementById('regPwd').value.trim();
+  const err   = document.getElementById('regErr');
+  const ok    = document.getElementById('regOk');
+  err.style.display=ok.style.display='none';
+  if(!name||!email||!phone||!pwd){showMsg(err,'Please fill in all fields','error');return;}
+  if(pwd.length<6){showMsg(err,'Password must be at least 6 characters','error');return;}
+  try {
+    const res  = await fetch(`${API}/customers/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,phone,password:pwd})});
+    const data = await res.json();
+    if(!data.success){showMsg(err,data.message,'error');return;}
+    TOKEN = data.token;
+    localStorage.setItem('sb_token', TOKEN);
+    localStorage.setItem('sb_customer', JSON.stringify(data.customer));
+    showMsg(ok,'Account created! Loading dashboard...','success');
+    setTimeout(()=>showDashboard(data.customer),1000);
+  } catch { showMsg(err,'Connection error. Try again.','error'); }
+}
+
+// ── Show Dashboard ────────────────────────────────────────────
+function showDashboard(customer) {
+  document.getElementById('authWrapper').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+  document.getElementById('dashName').textContent  = `Welcome back, ${customer.name}! 👋`;
+  document.getElementById('dashEmail').textContent = customer.email;
+  document.getElementById('profName').value  = customer.name  || '';
+  document.getElementById('profPhone').value = customer.phone || '';
+  document.getElementById('profEmail').value = customer.email || '';
+  loadOrders();
+  loadWishlist();
+  loadProfile();
+}
+
+// ── Panel switch ──────────────────────────────────────────────
+function showPanel(name) {
+  document.querySelectorAll('.dash-tab').forEach((t,i)=>t.classList.toggle('active',t.textContent.toLowerCase().includes(name)));
+  document.querySelectorAll('.dash-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`panel-${name}`).classList.add('active');
+}
+
+// ── Load Orders ───────────────────────────────────────────────
+async function loadOrders() {
+  try {
+    const res  = await fetch(`${API}/customers/my-orders`,{headers:{Authorization:`Bearer ${TOKEN}`}});
+    const data = await res.json();
+    if(!data.success||!data.orders.length){
+      document.getElementById('ordersList').innerHTML=`<div class="empty"><p>📦</p><h3>No orders yet!</h3><span>Time to grab some snacks!</span><br><a href="shop.html">SHOP NOW →</a></div>`;
+      return;
+    }
+    document.getElementById('ordersList').innerHTML = data.orders.map(o=>`
+      <div class="order-card">
+        <div class="order-top">
+          <div><div class="order-id">${o.orderId}</div><div class="order-date">${new Date(o.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}</div></div>
+          <span class="badge badge-${o.deliveryStatus||o.orderStatus||'placed'}">${o.deliveryStatus||o.orderStatus||'placed'}</span>
+        </div>
+        <div class="order-items">
+          ${(o.items||o.products||[]).map(item=>`<div class="order-item"><span>${item.name} <span style="color:#aaa">×${item.qty||item.quantity}</span></span><span>₹${(item.price*(item.qty||item.quantity)).toFixed(2)}</span></div>`).join('')}
+          <div class="order-total"><span>Total (COD)</span><span>₹${(o.amount||o.totalAmount||0).toFixed(2)}</span></div>
+        </div>
+        <div class="order-addr">📍 ${o.customer?.address || ''}</div>
+      </div>`).join('');
+  } catch { document.getElementById('ordersList').innerHTML='<div class="loading">Could not load orders.</div>'; }
+}
+
+// ── Load Wishlist ─────────────────────────────────────────────
+async function loadWishlist() {
+  try {
+    const res  = await fetch(`${API}/customers/wishlist`,{headers:{Authorization:`Bearer ${TOKEN}`}});
+    const data = await res.json();
+    if(!data.success||!data.wishlist.length){
+      document.getElementById('wishlistGrid').innerHTML=`<div class="empty"><p>❤️</p><h3>Your wishlist is empty!</h3><span>Save products you love.</span><br><a href="shop.html">BROWSE PRODUCTS →</a></div>`;
+      return;
+    }
+    document.getElementById('wishlistGrid').innerHTML=`<div class="wishlist-grid">${data.wishlist.map(p=>`
+      <div class="wish-card">
+        <img class="wish-img" src="${p.images?.[0]||'/images/default-snack.png'}" alt="${p.name}" onerror="this.src='/images/default-snack.png'">
+        <div class="wish-body">
+          <div class="wish-name">${p.name}</div>
+          <div class="wish-price">₹${p.discountPrice||p.price}</div>
+          <button class="btn-remove" onclick="removeWishlist('${p._id}')">Remove ✕</button>
+        </div>
+      </div>`).join('')}</div>`;
+  } catch { document.getElementById('wishlistGrid').innerHTML='<div class="loading">Could not load wishlist.</div>'; }
+}
+
+async function removeWishlist(productId) {
+  await fetch(`${API}/customers/wishlist/${productId}`,{method:'POST',headers:{Authorization:`Bearer ${TOKEN}`}});
+  loadWishlist();
+}
+
+// ── Load Profile (for address) ────────────────────────────────
+async function loadProfile() {
+  try {
+    const res  = await fetch(`${API}/customers/profile`,{headers:{Authorization:`Bearer ${TOKEN}`}});
+    const data = await res.json();
+    if(data.success && data.customer.savedAddress) {
+      const a = data.customer.savedAddress;
+      document.getElementById('addrLine1').value = a.line1  || '';
+      document.getElementById('addrCity').value  = a.city   || '';
+      document.getElementById('addrState').value = a.state  || '';
+      document.getElementById('addrPin').value   = a.pincode|| '';
+    }
+  } catch {}
+}
+
+// ── Save Address ──────────────────────────────────────────────
+async function saveAddress() {
+  const msg = document.getElementById('addrMsg');
+  msg.className='section-msg'; msg.style.display='none';
+  try {
+    const res = await fetch(`${API}/customers/address`,{
+      method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${TOKEN}`},
+      body:JSON.stringify({line1:document.getElementById('addrLine1').value,city:document.getElementById('addrCity').value,state:document.getElementById('addrState').value,pincode:document.getElementById('addrPin').value})
+    });
+    const data = await res.json();
+    showMsg(msg, data.success?'✅ Address saved!':data.message, data.success?'success':'error');
+  } catch { showMsg(msg,'Error saving address','error'); }
+}
+
+// ── Save Profile ──────────────────────────────────────────────
+async function saveProfile() {
+  const msg = document.getElementById('profileMsg');
+  msg.className='section-msg'; msg.style.display='none';
+  try {
+    const res = await fetch(`${API}/customers/profile`,{
+      method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${TOKEN}`},
+      body:JSON.stringify({name:document.getElementById('profName').value,phone:document.getElementById('profPhone').value})
+    });
+    const data = await res.json();
+    if(data.success){
+      const c = JSON.parse(localStorage.getItem('sb_customer')||'{}');
+      c.name = data.customer.name; c.phone = data.customer.phone;
+      localStorage.setItem('sb_customer', JSON.stringify(c));
+      document.getElementById('dashName').textContent=`Welcome back, ${c.name}! 👋`;
+    }
+    showMsg(msg, data.success?'✅ Profile updated!':data.message, data.success?'success':'error');
+  } catch { showMsg(msg,'Error saving profile','error'); }
+}
+
+// ── Change Password ───────────────────────────────────────────
+async function changePassword() {
+  const msg = document.getElementById('pwdMsg');
+  msg.className='section-msg'; msg.style.display='none';
+  const cur = document.getElementById('curPwd').value;
+  const nw  = document.getElementById('newPwd').value;
+  if(!cur||!nw){showMsg(msg,'Please fill both fields','error');return;}
+  if(nw.length<6){showMsg(msg,'New password must be at least 6 characters','error');return;}
+  try {
+    const res = await fetch(`${API}/customers/change-password`,{
+      method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${TOKEN}`},
+      body:JSON.stringify({currentPassword:cur,newPassword:nw})
+    });
+    const data = await res.json();
+    if(data.success){document.getElementById('curPwd').value='';document.getElementById('newPwd').value='';}
+    showMsg(msg, data.success?'✅ Password changed!':data.message, data.success?'success':'error');
+  } catch { showMsg(msg,'Error changing password','error'); }
+}
+
+// ── Logout ────────────────────────────────────────────────────
+function handleLogout() {
+  localStorage.removeItem('sb_token');
+  localStorage.removeItem('sb_customer');
+  location.reload();
+}
+
+// ── Helper ────────────────────────────────────────────────────
+function showMsg(el, msg, type) {
+  el.textContent=msg;
+  el.className=`section-msg ${type}`;
+  el.style.display='block';
+}
+</script>
+</body>
+</html>
