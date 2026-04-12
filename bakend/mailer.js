@@ -1,23 +1,52 @@
-const SibApiV3Sdk = require('@getbrevo/brevo');
-
-// ── Brevo API setup ───────────────────────────────────────────────
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-apiInstance.setApiKey(
-  SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
-  process.env.BREVO_API_KEY
-);
+// ═══════════════════════════════════════════════════════
+//  SNACK BAZAAR — Mailer (Brevo REST API via native fetch)
+//  No SDK dependency — works on any Node 18+ environment
+// ═══════════════════════════════════════════════════════
 
 if (!process.env.BREVO_API_KEY) {
   console.error('[MAILER] WARNING: BREVO_API_KEY is not set! Emails will fail.');
 }
 
-// ── Sender config ─────────────────────────────────────────────────
-const FROM_EMAIL = process.env.BREVO_FROM_EMAIL || 'kuldeepkumar784986@gmail.com';
-const FROM_NAME  = process.env.BREVO_FROM_NAME  || 'Snack Bazaar';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL     || 'kuldeepkumar784986@gmail.com';
+const FROM_EMAIL  = process.env.BREVO_FROM_EMAIL || 'kuldeepkumar784986@gmail.com';
+const FROM_NAME   = process.env.BREVO_FROM_NAME  || 'Snack Bazaar';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL      || 'kuldeepkumar784986@gmail.com';
 const REPLY_TO    = 'kuldeepkumar784986@gmail.com';
 
-// ── Shared email styles ───────────────────────────────────────────
+// ── Shared email sender (Brevo REST API) ─────────────────────────
+async function sendEmail({ to, subject, html, tags = [] }) {
+  const body = {
+    sender:      { name: FROM_NAME, email: FROM_EMAIL },
+    to:          Array.isArray(to) ? to : [{ email: to }],
+    replyTo:     { email: REPLY_TO },
+    subject,
+    htmlContent: html,
+  };
+  if (tags.length) body.tags = tags;
+
+  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method:  'POST',
+    headers: {
+      'api-key':      process.env.BREVO_API_KEY,
+      'Content-Type': 'application/json',
+      'Accept':       'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  const text = await response.text();
+  let result;
+  try { result = JSON.parse(text); } catch { result = { raw: text }; }
+
+  if (!response.ok) {
+    console.error('[MAILER] Brevo API error:', response.status, JSON.stringify(result));
+    throw new Error(`Brevo send failed (${response.status}): ${text}`);
+  }
+
+  console.log('[MAILER] Email sent via Brevo:', JSON.stringify(result));
+  return result;
+}
+
+// ── Email style ───────────────────────────────────────────────────
 const getEmailStyle = () => `
   <style>
     body { font-family:'Helvetica Neue',Arial,sans-serif; background:#f4f6f8; padding:20px; margin:0; }
@@ -35,8 +64,8 @@ const getEmailStyle = () => `
 `;
 
 const getItemsHtml = (items = [], totalAmount = 0) => {
-  const rows = items.map(item =>
-    `<tr><td>${item.name}</td><td>${item.qty}</td><td>&#8377;${item.price}</td></tr>`
+  const rows = items.map(i =>
+    `<tr><td>${i.name}</td><td>${i.qty}</td><td>&#8377;${i.price}</td></tr>`
   ).join('');
   return `
     <table class="order-details">
@@ -46,27 +75,11 @@ const getItemsHtml = (items = [], totalAmount = 0) => {
     </table>`;
 };
 
-// ── Helper: send via Brevo ────────────────────────────────────────
-async function sendEmail({ to, subject, html, tags = [] }) {
-  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-
-  sendSmtpEmail.sender    = { name: FROM_NAME, email: FROM_EMAIL };
-  sendSmtpEmail.to        = Array.isArray(to) ? to : [to];
-  sendSmtpEmail.replyTo   = { email: REPLY_TO };
-  sendSmtpEmail.subject   = subject;
-  sendSmtpEmail.htmlContent = html;
-  if (tags.length) sendSmtpEmail.tags = tags;
-
-  const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-  console.log('[MAILER] Sent via Brevo:', JSON.stringify(result));
-  return result;
-}
-
 // ── 1. Order Confirmation → Customer ─────────────────────────────
 const sendOrderConfirmationToCustomer = async (order) => {
   if (!order.customer?.email) {
-    console.warn('[MAILER] sendOrderConfirmationToCustomer: no customer email, skipping');
-    return { skipped: true, reason: 'no_email' };
+    console.warn('[MAILER] No customer email — skipping confirmation');
+    return { skipped: true };
   }
 
   const html = `<html><head>${getEmailStyle()}</head><body>
@@ -120,9 +133,7 @@ const sendNewOrderAlertToAdmin = async (order) => {
 
 // ── 3. Status Update → Customer ──────────────────────────────────
 const sendStatusUpdateToCustomer = async (order, status) => {
-  if (!order.customer?.email) {
-    return { skipped: true, reason: 'no_email' };
-  }
+  if (!order.customer?.email) return { skipped: true };
 
   const formattedStatus = status.replace('_', ' ').toUpperCase();
 
@@ -157,7 +168,7 @@ const sendTestEmail = async () => {
     subject: '🧪 Snack Bazaar — Brevo Email Test',
     html: `<html><body style="font-family:sans-serif;padding:20px;">
       <h2 style="color:#511b8b;">✅ Brevo Email Working!</h2>
-      <p>If you received this, Brevo is correctly configured on Railway.</p>
+      <p>Brevo REST API is correctly configured on Railway.</p>
       <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
       <p><strong>From:</strong> ${FROM_EMAIL} (${FROM_NAME})</p>
       <p><strong>To:</strong> ${ADMIN_EMAIL}</p>
