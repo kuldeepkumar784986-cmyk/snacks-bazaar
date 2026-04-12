@@ -1,24 +1,27 @@
-const { Resend } = require('resend');
+const SibApiV3Sdk = require('@getbrevo/brevo');
 
-// Validate API key on startup
-if (!process.env.RESEND_API_KEY) {
-  console.error('[MAILER] WARNING: RESEND_API_KEY is not set! Emails will fail.');
+// ── Brevo API setup ───────────────────────────────────────────────
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+apiInstance.setApiKey(
+  SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
+  process.env.BREVO_API_KEY
+);
+
+if (!process.env.BREVO_API_KEY) {
+  console.error('[MAILER] WARNING: BREVO_API_KEY is not set! Emails will fail.');
 }
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// ── Sender config ─────────────────────────────────────────────────
+const FROM_EMAIL = process.env.BREVO_FROM_EMAIL || 'kuldeepkumar784986@gmail.com';
+const FROM_NAME  = process.env.BREVO_FROM_NAME  || 'Snack Bazaar';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL     || 'kuldeepkumar784986@gmail.com';
+const REPLY_TO    = 'kuldeepkumar784986@gmail.com';
 
-// ── Sender address ───────────────────────────────────────────────
-// In Resend sandbox (free tier), you can ONLY send FROM onboarding@resend.dev
-// and ONLY TO your verified email. To send to any address, you must verify
-// a domain in Resend dashboard and set RESEND_FROM_EMAIL in Railway.
-const FROM_ADDRESS = process.env.RESEND_FROM_EMAIL || 'Snack Bazaar <onboarding@resend.dev>';
-const ADMIN_EMAIL  = process.env.ADMIN_EMAIL || 'kuldeepkumar784986@gmail.com';
-
-// ── Email styling ─────────────────────────────────────────────────
+// ── Shared email styles ───────────────────────────────────────────
 const getEmailStyle = () => `
   <style>
-    body { font-family: 'Helvetica Neue', Arial, sans-serif; background:#f4f6f8; padding:20px; margin:0; }
-    .container { max-width:600px; margin:0 auto; background:#ffffff; padding:30px; border-radius:12px; border:1px solid #eeeeee; }
+    body { font-family:'Helvetica Neue',Arial,sans-serif; background:#f4f6f8; padding:20px; margin:0; }
+    .container { max-width:600px; margin:0 auto; background:#fff; padding:30px; border-radius:12px; border:1px solid #eee; }
     h1 { color:#511b8b; font-size:24px; margin-bottom:20px; }
     h2 { color:#333; font-size:18px; margin-top:30px; border-bottom:2px solid #511b8b; padding-bottom:10px; }
     p  { color:#555; line-height:1.6; font-size:16px; }
@@ -32,16 +35,32 @@ const getEmailStyle = () => `
 `;
 
 const getItemsHtml = (items = [], totalAmount = 0) => {
-  let rows = items.map(item =>
-    `<tr><td>${item.name}</td><td>${item.qty}</td><td>₹${item.price}</td></tr>`
+  const rows = items.map(item =>
+    `<tr><td>${item.name}</td><td>${item.qty}</td><td>&#8377;${item.price}</td></tr>`
   ).join('');
   return `
     <table class="order-details">
       <tr><th>Item</th><th>Qty</th><th>Price</th></tr>
       ${rows}
-      <tr class="total-row"><td colspan="2">Total</td><td>₹${totalAmount}</td></tr>
+      <tr class="total-row"><td colspan="2">Total</td><td>&#8377;${totalAmount}</td></tr>
     </table>`;
 };
+
+// ── Helper: send via Brevo ────────────────────────────────────────
+async function sendEmail({ to, subject, html, tags = [] }) {
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+
+  sendSmtpEmail.sender    = { name: FROM_NAME, email: FROM_EMAIL };
+  sendSmtpEmail.to        = Array.isArray(to) ? to : [to];
+  sendSmtpEmail.replyTo   = { email: REPLY_TO };
+  sendSmtpEmail.subject   = subject;
+  sendSmtpEmail.htmlContent = html;
+  if (tags.length) sendSmtpEmail.tags = tags;
+
+  const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
+  console.log('[MAILER] Sent via Brevo:', JSON.stringify(result));
+  return result;
+}
 
 // ── 1. Order Confirmation → Customer ─────────────────────────────
 const sendOrderConfirmationToCustomer = async (order) => {
@@ -52,72 +71,58 @@ const sendOrderConfirmationToCustomer = async (order) => {
 
   const html = `<html><head>${getEmailStyle()}</head><body>
     <div class="container">
-      <h1>🎉 Order Confirmed, ${order.customer.name || 'Snack Lover'}!</h1>
+      <h1>&#127881; Order Confirmed, ${order.customer.name || 'Snack Lover'}!</h1>
       <p>Your order <strong>${order.orderId}</strong> has been received and is being packed.</p>
       <p>Payment: <span class="badge">${order.paymentMethod}</span></p>
       <h2>Your Items</h2>
       ${getItemsHtml(order.items, order.amount)}
-      <h2>Delivery To</h2>
+      <h2>Delivery Address</h2>
       <p>${order.customer.address || 'N/A'}</p>
-      <p>Questions? Reply to this email anytime!</p>
-      <div class="footer">Snack Bazaar &mdash; India's Premium Snack Hub 🍿</div>
+      <p>Questions? Just reply to this email!</p>
+      <div class="footer">Snack Bazaar &mdash; India's Premium Snack Hub &#127871;</div>
     </div>
   </body></html>`;
 
-  const result = await resend.emails.send({
-    from:     FROM_ADDRESS,
-    to:       [order.customer.email],
-    reply_to: 'kuldeepkumar784986@gmail.com',
-    subject:  `✅ Order Confirmed: ${order.orderId} — Snack Bazaar`,
+  return sendEmail({
+    to:      [{ email: order.customer.email, name: order.customer.name || 'Customer' }],
+    subject: `✅ Order Confirmed: ${order.orderId} — Snack Bazaar`,
     html,
-    tags: [{ name: 'category', value: 'order_confirmation' }],
+    tags:    ['order_confirmation'],
   });
-
-  console.log('[MAILER] Customer email sent:', JSON.stringify(result));
-  return result;
 };
 
 // ── 2. New Order Alert → Admin ───────────────────────────────────
 const sendNewOrderAlertToAdmin = async (order) => {
-  const to = ADMIN_EMAIL;
-  if (!to) {
-    console.warn('[MAILER] sendNewOrderAlertToAdmin: ADMIN_EMAIL not set, skipping');
-    return { skipped: true, reason: 'no_admin_email' };
-  }
-
   const html = `<html><head>${getEmailStyle()}</head><body>
     <div class="container">
-      <h1>💥 New Order: ${order.orderId}</h1>
+      <h1>&#128165; New Order: ${order.orderId}</h1>
       <p>Payment via <strong>${order.paymentMethod}</strong></p>
-      <h2>Customer</h2>
+      <h2>Customer Details</h2>
       <p>
         <strong>Name:</strong> ${order.customer?.name || 'N/A'}<br>
         <strong>Email:</strong> ${order.customer?.email || 'N/A'}<br>
         <strong>Phone:</strong> ${order.customer?.phone || 'N/A'}<br>
         <strong>Address:</strong> ${order.customer?.address || 'N/A'}
       </p>
-      <h2>Items</h2>
+      <h2>Items Ordered</h2>
       ${getItemsHtml(order.items, order.amount)}
       <div class="footer">Snack Bazaar Admin Alert</div>
     </div>
   </body></html>`;
 
-  const result = await resend.emails.send({
-    from:     FROM_ADDRESS,
-    to:       [to],
-    reply_to: 'kuldeepkumar784986@gmail.com',
-    subject:  `💥 NEW ORDER: ${order.orderId} — ₹${order.amount}`,
+  return sendEmail({
+    to:      [{ email: ADMIN_EMAIL, name: 'Snack Bazaar Admin' }],
+    subject: `💥 NEW ORDER: ${order.orderId} — ₹${order.amount}`,
     html,
-    tags: [{ name: 'category', value: 'admin_alert' }],
+    tags:    ['admin_alert'],
   });
-
-  console.log('[MAILER] Admin email sent:', JSON.stringify(result));
-  return result;
 };
 
 // ── 3. Status Update → Customer ──────────────────────────────────
 const sendStatusUpdateToCustomer = async (order, status) => {
-  if (!order.customer?.email) return { skipped: true, reason: 'no_email' };
+  if (!order.customer?.email) {
+    return { skipped: true, reason: 'no_email' };
+  }
 
   const formattedStatus = status.replace('_', ' ').toUpperCase();
 
@@ -129,48 +134,37 @@ const sendStatusUpdateToCustomer = async (order, status) => {
          padding:20px;border:2px dashed #ff5e8a;border-radius:8px;">
         STATUS: ${formattedStatus}
       </p>
-      <p>Questions? Reply to this email.</p>
-      <div class="footer">Snack Bazaar &mdash; India's Premium Snack Hub 🍿</div>
+      <p>Questions? Just reply to this email!</p>
+      <div class="footer">Snack Bazaar &mdash; India's Premium Snack Hub &#127871;</div>
     </div>
   </body></html>`;
 
-  const result = await resend.emails.send({
-    from:     FROM_ADDRESS,
-    to:       [order.customer.email],
-    reply_to: 'kuldeepkumar784986@gmail.com',
-    subject:  `📦 Order Update: ${order.orderId} — ${formattedStatus}`,
+  return sendEmail({
+    to:      [{ email: order.customer.email, name: order.customer.name || 'Customer' }],
+    subject: `📦 Order Update: ${order.orderId} — ${formattedStatus}`,
     html,
-    tags: [{ name: 'category', value: 'status_update' }],
+    tags:    ['status_update'],
   });
-
-  console.log('[MAILER] Status update email sent:', JSON.stringify(result));
-  return result;
 };
 
-// ── 4. Test Email (for /api/test-email route) ─────────────────────
+// ── 4. Test Email ─────────────────────────────────────────────────
 const sendTestEmail = async () => {
-  const to = ADMIN_EMAIL;
-  console.log('[MAILER] sendTestEmail → FROM:', FROM_ADDRESS, '| TO:', to);
-  console.log('[MAILER] RESEND_API_KEY set:', !!process.env.RESEND_API_KEY);
+  console.log('[MAILER] sendTestEmail → FROM:', FROM_EMAIL, '| TO:', ADMIN_EMAIL);
+  console.log('[MAILER] BREVO_API_KEY set:', !!process.env.BREVO_API_KEY);
 
-  const result = await resend.emails.send({
-    from:     FROM_ADDRESS,
-    to:       [to],
-    reply_to: 'kuldeepkumar784986@gmail.com',
-    subject:  '🧪 Snack Bazaar — Email System Test',
+  return sendEmail({
+    to:      [{ email: ADMIN_EMAIL, name: 'Snack Bazaar Admin' }],
+    subject: '🧪 Snack Bazaar — Brevo Email Test',
     html: `<html><body style="font-family:sans-serif;padding:20px;">
-      <h2 style="color:#511b8b;">✅ Email System Working!</h2>
-      <p>If you received this, Resend is correctly configured on Railway.</p>
+      <h2 style="color:#511b8b;">✅ Brevo Email Working!</h2>
+      <p>If you received this, Brevo is correctly configured on Railway.</p>
       <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
-      <p><strong>From:</strong> ${FROM_ADDRESS}</p>
-      <p><strong>To:</strong> ${to}</p>
+      <p><strong>From:</strong> ${FROM_EMAIL} (${FROM_NAME})</p>
+      <p><strong>To:</strong> ${ADMIN_EMAIL}</p>
       <p style="color:#888;font-size:12px;">Snack Bazaar — snacks-bazaar-production.up.railway.app</p>
     </body></html>`,
-    tags: [{ name: 'category', value: 'test' }],
+    tags: ['test'],
   });
-
-  console.log('[MAILER] Test email result:', JSON.stringify(result));
-  return result;
 };
 
 module.exports = {
