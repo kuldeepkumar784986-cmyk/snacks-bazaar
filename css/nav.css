@@ -1,3 +1,86 @@
+/* ═══════════════════════════════════════════════
+   SCROLLING TICKER BANNER
+   ═══════════════════════════════════════════════ */
+.ticker-banner {
+  background: linear-gradient(90deg, #ff6b00 0%, #ff9500 50%, #ffcc00 100%);
+  height: 38px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  /* Sits right below the sticky nav */
+  z-index: 99;
+}
+
+/* Fade edges for polish */
+.ticker-banner::before,
+.ticker-banner::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 60px;
+  z-index: 2;
+  pointer-events: none;
+}
+.ticker-banner::before {
+  left: 0;
+  background: linear-gradient(90deg, #ff6b00, transparent);
+}
+.ticker-banner::after {
+  right: 0;
+  background: linear-gradient(90deg, transparent, #ffcc00);
+}
+
+.ticker-track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  /* Animation: slides the full track left by 50% (content is doubled for seamless loop) */
+  animation: ticker-scroll 22s linear infinite;
+  will-change: transform;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body, 'DM Sans', sans-serif);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  padding: 0 2.5rem;
+  flex-shrink: 0;
+}
+
+.ticker-sep {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.6rem;
+  padding: 0 0.5rem;
+}
+
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@media (max-width: 768px) {
+  .ticker-banner { height: 34px; }
+  .ticker-item {
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    padding: 0 1.5rem;
+  }
+}
+
+
 .nav {
   position: sticky;
   top: 0;
