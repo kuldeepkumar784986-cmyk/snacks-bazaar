@@ -7,7 +7,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 require('dotenv').config();
-const { sendOrderConfirmationToCustomer, sendNewOrderAlertToAdmin, sendStatusUpdateToCustomer } = require('./mailer');
+const { sendOrderConfirmationToCustomer, sendNewOrderAlertToAdmin, sendStatusUpdateToCustomer, sendTestEmail } = require('./mailer');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -238,6 +238,37 @@ app.get('/api/products/:id', async (req, res) => {
 });
 
 // POST /api/products — add new product
+// GET /api/test-email — Diagnose Resend email config
+app.get('/api/test-email', async (req, res) => {
+  try {
+    console.log('[TEST-EMAIL] Route hit');
+    const result = await sendTestEmail();
+    res.json({
+      success: true,
+      message: 'Test email sent! Check kuldeepkumar784986@gmail.com',
+      resend_response: result,
+      env_check: {
+        RESEND_API_KEY_set: !!process.env.RESEND_API_KEY,
+        ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'kuldeepkumar784986@gmail.com (fallback)',
+        RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev (sandbox fallback)',
+      }
+    });
+  } catch (err) {
+    console.error('[TEST-EMAIL] FAILED:', err);
+    res.status(500).json({
+      success: false,
+      error: err.message,
+      full_error: JSON.stringify(err, null, 2),
+      env_check: {
+        RESEND_API_KEY_set: !!process.env.RESEND_API_KEY,
+        ADMIN_EMAIL: process.env.ADMIN_EMAIL || '(not set)',
+        RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL || '(not set)',
+      }
+    });
+  }
+});
+
+// POST /api/products — add new product
 app.post('/api/products', async (req, res) => {
   try {
     const { productId, name, category, price, weight, image, description, stock } = req.body;
@@ -294,7 +325,7 @@ app.delete('/api/products/:id', async (req, res) => {
 app.post('/api/orders', async (req, res) => {
   try {
     const { amount, items, customer } = req.body;
-    
+
     if (!amount || !items || items.length === 0) {
       return res.status(400).json({ success: false, message: 'Valid amount and items are required' });
     }
@@ -311,11 +342,26 @@ app.post('/api/orders', async (req, res) => {
       deliveryStatus: 'pending',
     });
 
-    try { 
-      await sendOrderConfirmationToCustomer(order); 
-      await sendNewOrderAlertToAdmin(order); 
-    } catch(e) { 
-      console.warn('Email error:', e.message); 
+    // ── Email Logging & Sending ──
+    console.log('[ORDER] Saved:', orderId, '| Customer email:', order.customer?.email || '(none)');
+    console.log('[ORDER] RESEND_API_KEY set:', !!process.env.RESEND_API_KEY);
+    console.log('[ORDER] ADMIN_EMAIL:', process.env.ADMIN_EMAIL || '(not set)');
+
+    try {
+      if (order.customer?.email) {
+        console.log('[EMAIL] Sending confirmation to customer:', order.customer.email);
+        const custResult = await sendOrderConfirmationToCustomer(order);
+        console.log('[EMAIL] Customer email result:', JSON.stringify(custResult));
+      } else {
+        console.warn('[EMAIL] Skipping customer email — no email address provided');
+      }
+
+      console.log('[EMAIL] Sending admin alert to:', process.env.ADMIN_EMAIL);
+      const adminResult = await sendNewOrderAlertToAdmin(order);
+      console.log('[EMAIL] Admin email result:', JSON.stringify(adminResult));
+    } catch (emailErr) {
+      console.error('[EMAIL] SEND FAILED:', emailErr.message);
+      console.error('[EMAIL] Full error:', JSON.stringify(emailErr, null, 2));
     }
 
     // Reduce stock for each item
@@ -340,6 +386,7 @@ app.post('/api/orders', async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to place order' });
   }
 });
+
 
 // GET /api/orders/:id — Track order by number (e.g. SB-1001)
 app.get('/api/orders/:id', async (req, res) => {
