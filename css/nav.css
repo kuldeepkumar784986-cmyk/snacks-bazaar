@@ -24,14 +24,74 @@
   color: var(--color-purple-deep);
 }
 
+/* ═══════════════════════════════════
+   SNACK BAZAAR — Logo Wordmark
+   ═══════════════════════════════════ */
 .logo-box {
-  font-family: var(--font-display);
-  font-size: 1.8rem;
-  color: var(--color-purple-deep);
-  border: 3px solid var(--color-purple-deep);
-  padding: 4px 12px;
-  letter-spacing: 0.05em;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+  text-decoration: none;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  gap: 1px;
+}
+
+.logo-box:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+/* The main wordmark row */
+.logo-wordmark {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Bebas Neue', var(--font-display), sans-serif;
+  font-size: 1.75rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+/* Icon */
+.logo-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(234,108,0,0.25));
+  transform: rotate(-8deg);
   display: inline-block;
+  transition: transform 0.3s ease;
+}
+.logo-box:hover .logo-icon {
+  transform: rotate(0deg) scale(1.15);
+}
+
+/* SNACK — warm orange gradient */
+.logo-snack {
+  background: linear-gradient(135deg, #ff6b00 0%, #ffa500 55%, #ffd000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 900;
+}
+
+/* BAZAAR — brand purple */
+.logo-bazaar {
+  color: var(--color-purple-deep, #3d1d91);
+  font-weight: 900;
+}
+
+/* Tagline */
+.logo-tagline {
+  font-family: var(--font-body, 'DM Sans'), sans-serif;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ff8800;
+  opacity: 0.85;
+  padding-left: 2px;
+  line-height: 1;
 }
 
 .nav__left, .nav__right {

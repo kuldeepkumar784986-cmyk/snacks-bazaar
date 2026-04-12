@@ -34,7 +34,12 @@
     
     /* ── Sidebar ── */
     .sidebar { background: var(--color-purple-deep); color: white; padding: 2rem 1rem; display: flex; flex-direction: column; }
-    .brand-logo { font-family: var(--font-display); font-size: 2rem; color: var(--color-pink-hot); letter-spacing: 1px; margin-bottom: 3rem; text-align: center; line-height: 1; }
+    .brand-logo { margin-bottom: 3rem; text-align: center; line-height: 1; }
+    .brand-logo .logo-wordmark { font-family: var(--font-display); font-size: 1.6rem; letter-spacing: 0.06em; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .brand-logo .logo-icon { font-size: 1.3rem; transform: rotate(-8deg); display: inline-block; }
+    .brand-logo .logo-snack { background: linear-gradient(135deg, #ff6b00 0%, #ffa500 55%, #ffd000 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 900; }
+    .brand-logo .logo-bazaar { color: white; font-weight: 900; }
+    .brand-logo .logo-tagline { font-size: 0.48rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #ffaa44; opacity: 0.8; display: block; margin-top: 3px; }
     
     .nav-btn { background: transparent; border: none; color: #ccbcf4; text-align: left; padding: 1rem; font-family: var(--font-body); font-weight: 600; font-size: 1rem; cursor: pointer; border-radius: 8px; margin-bottom: 0.5rem; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
     .nav-btn:hover { background: rgba(255,255,255,0.1); color: white; }
@@ -157,7 +162,7 @@
     
     <!-- Sidebar -->
     <aside class="sidebar">
-      <div class="brand-logo">HQ<br>SNACKS</div>
+      <div class="brand-logo"><span class="logo-wordmark"><span class="logo-icon">🍿</span><span class="logo-snack">SNACK</span><span class="logo-bazaar">BAZAAR</span></span><span class="logo-tagline">India's Snack Hub</span></div>
       <button class="nav-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
       <button class="nav-btn" onclick="switchTab('orders')">📦 Orders</button>
       <button class="nav-btn" onclick="switchTab('products')">🛍️ Products</button>
