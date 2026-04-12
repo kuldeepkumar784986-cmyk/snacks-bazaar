@@ -6,7 +6,7 @@
 
 const API_URLS = {
   primary: 'https://snacks-bazaar-production.up.railway.app/api',
-  backup:  'https://snack-bazaar-backend.onrender.com/api',  // update after Render deploy
+  backup:  'https://snack-bazaar-backend-YOURNAME.koyeb.app/api', // ← update after Koyeb deploy
 };
 
 // Stores the working URL so we don't retry on every call
