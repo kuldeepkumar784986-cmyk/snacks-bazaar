@@ -20,25 +20,12 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // ──────────────────── Middleware ────────────────────
-const allowedOrigins = [
-  'https://snacks-bazaar.vercel.app',
-  'https://snacks-bazaar-5yf07axd4-kuldeep5.vercel.app',
-  'http://localhost:5500',
-  'http://127.0.0.1:5500',
-  'http://localhost:3000',
-];
-
+// origin: true — reflect any request origin back (allows all browsers incl. mobile)
+// Safe for a public storefront API. Re-restrict after debugging if needed.
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, etc.)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'));
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  origin: true,
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
