@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Snack Bazaar | Admin Dashboard</title>
+  <title>Snack Bazaar | HQ Admin Panel</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/variables.css">
   <link rel="stylesheet" href="/css/base.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
-    body { background: var(--color-off-white); font-family: var(--font-body); margin: 0; padding: 0; }
+    body { background: var(--color-off-white); font-family: var(--font-body); margin: 0; padding: 0; overflow-x: hidden; }
     
     /* ── Login Overlay ── */
     #loginOverlay {
@@ -21,62 +23,83 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     }
     .login-box h1 { font-family: var(--font-display); color: var(--color-purple-deep); font-size: 2.5rem; margin-bottom: 1.5rem; }
-    .auth-input {
-      width: 100%; padding: 0.8rem; margin-bottom: 1rem;
-      border: 2px solid #eee; border-radius: 10px; font-family: var(--font-body); font-size: 1rem;
-    }
+    .auth-input { width: 100%; padding: 0.8rem; margin-bottom: 1rem; border: 2px solid #eee; border-radius: 10px; font-family: var(--font-body); font-size: 1rem; }
     .auth-input:focus { outline: none; border-color: var(--color-purple-mid); }
-    .btn-login {
-      width: 100%; padding: 1rem; background: var(--color-pink-hot); color: white;
-      font-family: var(--font-display); font-size: 1.25rem; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s;
-    }
+    .btn-login { width: 100%; padding: 1rem; background: var(--color-pink-hot); color: white; font-family: var(--font-display); font-size: 1.25rem; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s; }
     .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255, 94, 138, 0.4); }
 
-    /* ── Dashboard Base ── */
-    #dashboard { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; }
-    .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.5rem; }
-    .dash-header h1 { font-size: 3rem; color: var(--color-purple-deep); margin: 0; line-height: 1; }
-    .btn-logout { background: var(--color-purple-light); color: var(--color-purple-deep); border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-family: var(--font-accent); font-weight: 700; font-size: 0.8rem; }
+    /* ── App Layout ── */
+    #appLayout { display: none; min-height: 100vh; display: grid; grid-template-columns: 240px 1fr; background: #f4f6f8; }
+    #appLayout.hidden { display: none; }
+    
+    /* ── Sidebar ── */
+    .sidebar { background: var(--color-purple-deep); color: white; padding: 2rem 1rem; display: flex; flex-direction: column; }
+    .brand-logo { font-family: var(--font-display); font-size: 2rem; color: var(--color-pink-hot); letter-spacing: 1px; margin-bottom: 3rem; text-align: center; line-height: 1; }
+    
+    .nav-btn { background: transparent; border: none; color: #ccbcf4; text-align: left; padding: 1rem; font-family: var(--font-body); font-weight: 600; font-size: 1rem; cursor: pointer; border-radius: 8px; margin-bottom: 0.5rem; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
+    .nav-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+    .nav-btn.active { background: var(--color-pink-hot); color: white; }
+    .btn-logout { margin-top: auto; background: rgba(255,255,255,0.1); color: white; border: none; padding: 1rem; border-radius: 8px; cursor: pointer; font-family: var(--font-body); font-weight: 700; width: 100%; }
+    .btn-logout:hover { background: rgba(255,255,255,0.2); }
 
-    /* ── Stats ── */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    /* ── Main Content ── */
+    .main-content { padding: 2rem 3rem; overflow-y: auto; height: 100vh; }    
+    .view-tab { display: none; animation: fadeIn 0.3s ease; }
+    .view-tab.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .header-action { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .header-action h2 { font-size: 2.5rem; color: var(--color-dark-text); margin: 0; line-height: 1.1; }
+    
+    .btn-action { background: var(--color-purple-deep); color: white; font-family: var(--font-body); font-weight: bold; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .btn-action:hover { background: var(--color-purple-mid); }
+
+    /* ── Dashboard Specifics ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
     .stat-card { background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-    .stat-label { font-family: var(--font-accent); font-size: 0.8rem; color: #888; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .stat-label { font-family: var(--font-accent); font-size: 0.85rem; color: #888; text-transform: uppercase; margin-bottom: 0.5rem; }
     .stat-value { font-family: var(--font-display); font-size: 2.5rem; color: var(--color-purple-deep); line-height: 1; }
 
-    /* ── Orders Table ── */
-    .table-card { background: white; border-radius: 12px; padding: 1.5rem; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow-x: auto; }
-    .table-title { font-family: var(--font-display); font-size: 1.5rem; color: var(--color-dark-text); margin-bottom: 1rem; }
-    table { width: 100%; border-collapse: collapse; min-width: 800px; }
-    th { text-align: left; padding: 1rem; border-bottom: 2px solid #f0f0f0; font-family: var(--font-accent); font-size: 0.75rem; color: #888; }
-    td { padding: 1.25rem 1rem; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; vertical-align: middle; }
+    .chart-container { background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid #eee; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+
+    /* ── Tables ── */
+    .table-wrapper { background: white; border-radius: 12px; border: 1px solid #eee; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow-x: auto; margin-bottom: 2rem;}
+    table { width: 100%; border-collapse: collapse; min-width: 800px; text-align: left; }
+    th { padding: 1rem 1.5rem; border-bottom: 2px solid #f0f0f0; font-family: var(--font-accent); font-size: 0.75rem; color: #888; text-transform: uppercase; background:#fafafa;}
+    td { padding: 1.25rem 1.5rem; border-bottom: 1px solid #f0f0f0; font-size: 0.95rem; vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fdfdfd; }
     
     .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 6px; font-family: var(--font-accent); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
     .badge-cod { background: #ffe4e6; color: #e11d48; }
     .badge-paid { background: #dcfce7; color: #16a34a; }
     .badge-pending { background: #fef08a; color: #854d0e; }
     
-    .status-select { padding: 0.4rem 0.6rem; border-radius: 8px; border: 1px solid #ddd; font-family: var(--font-body); font-size: 0.85rem; font-weight: 600; cursor: pointer; outline: none; background: #fafafa; }
-    .status-select:hover { border-color: var(--color-purple-deep); }
-    .status-pending { color: #d97706; }
-    .status-shipped { color: #3b82f6; }
-    .status-delivered { color: #16a34a; }
-    .status-cancelled { color: #dc2626; }
-
-    .btn-save { background: var(--color-purple-mid); color: white; border: none; border-radius: 8px; padding: 0.4rem 0.8rem; font-family: var(--font-body); font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; opacity: 0; pointer-events: none; margin-left: 0.5rem; }
+    .status-select { padding: 0.4rem; border-radius: 6px; border: 1px solid #ddd; font-family: var(--font-body); font-size: 0.85rem; font-weight: 600; cursor: pointer; outline: none; background: #fafafa; }
+    .btn-save { background: var(--color-purple-mid); color: white; border: none; border-radius: 6px; padding: 0.4rem 0.8rem; font-family: var(--font-body); font-size: 0.75rem; font-weight: 700; cursor: pointer; opacity: 0; pointer-events: none; margin-left: 0.5rem; }
     .btn-save.show { opacity: 1; pointer-events: all; }
-    .btn-save:hover { background: var(--color-purple-deep); }
     
-    .loading { text-align: center; padding: 3rem; font-size: 1.2rem; color: #888; font-family: var(--font-accent); }
-    
-    .customer-info { display: flex; flex-direction: column; gap: 4px; }
-    .item-list { font-size: 0.8rem; color: #666; margin-top: 4px; }
+    .loading-pane { text-align: center; padding: 4rem; color: #888; font-family: var(--font-accent); font-size: 1.2rem; }
+
+    /* ── Modal ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; pointer-events: none; transition: 0.2s; }
+    .modal-overlay.active { opacity: 1; pointer-events: all; }
+    .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 12px; padding: 2rem; transform: translateY(20px); transition: 0.3s; }
+    .modal-overlay.active .modal-content { transform: translateY(0); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .modal-header h3 { font-size: 1.5rem; color: var(--color-dark-text); margin: 0; font-family: var(--font-display); }
+    .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #888; }
+    .form-group { margin-bottom: 1rem; text-align: left; }
+    .form-group label { display: block; font-family: var(--font-accent); font-size: 0.8rem; color: #666; margin-bottom: 0.4rem; }
+    .form-input { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-family: var(--font-body); font-size: 1rem; }
+    .form-row { display: flex; gap: 1rem; }
+    .form-row > * { flex: 1; }
   </style>
 </head>
 <body>
 
-  <!-- ADMIN LOGIN -->
+  <!-- AUTHENTICATION -->
   <div id="loginOverlay">
     <div class="login-box">
       <h1>ADMIN PORTAL</h1>
@@ -85,53 +108,162 @@
         <input type="password" id="password" class="auth-input" placeholder="Password" required>
         <button type="submit" class="btn-login">SECURE LOGIN</button>
       </form>
-      <p id="loginError" style="color: #e11d48; font-size: 0.85rem; margin-top: 1rem; display: none;">Invalid credentials. Please try again.</p>
+      <p id="loginError" style="color: #e11d48; font-size: 0.85rem; margin-top: 1rem; display: none;">Invalid credentials.</p>
     </div>
   </div>
 
-  <!-- DASHBOARD -->
-  <div id="dashboard">
-    <div class="dash-header">
-      <h1>HQ COMMAND CENTER</h1>
-      <button class="btn-logout" onclick="logout()">LOGOUT</button>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Total Orders</div>
-        <div class="stat-value" id="statOrders">--</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Revenue (COD + Online)</div>
-        <div class="stat-value" id="statRevenue">₹0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Pending Shipments</div>
-        <div class="stat-value" id="statPending">--</div>
-      </div>
-    </div>
-
-    <!-- Orders -->
-    <div class="table-card">
-      <h2 class="table-title">Recent Orders</h2>
-      <div id="ordersContainer">
-        <div class="loading">Loading live data from Railway API... 📡</div>
-      </div>
-    </div>
+  <!-- APP LAYOUT -->
+  <div id="appLayout" class="hidden">
     
-    <!-- Inventory Management -->
-    <div class="table-card" style="margin-top: 2rem;">
-      <h2 class="table-title">Inventory Management</h2>
-      <div id="productsContainer">
-        <div class="loading">Loading live inventory data from Railway API... 📡</div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand-logo">HQ<br>SNACKS</div>
+      <button class="nav-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+      <button class="nav-btn" onclick="switchTab('orders')">📦 Orders</button>
+      <button class="nav-btn" onclick="switchTab('products')">🛍️ Products</button>
+      <button class="nav-btn" onclick="switchTab('customers')">👥 Customers</button>
+      <button class="nav-btn" onclick="switchTab('analytics')">📈 Analytics</button>
+      <button class="btn-logout" onclick="logout()">LOGOUT</button>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      
+      <!-- TAB: DASHBOARD -->
+      <section id="tab-dashboard" class="view-tab active">
+        <div class="header-action">
+          <h2>Overview</h2>
+          <button class="btn-action" onclick="fetchBackendData()">Refresh Data</button>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value" id="dashTotalRev">₹ ---</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Orders (All Time)</div>
+            <div class="stat-value" id="dashTotalOrders">--</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pending Fulfillment</div>
+            <div class="stat-value" id="dashPending" style="color: #d97706;">--</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Customers</div>
+            <div class="stat-value" id="dashCustomers">--</div>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <canvas id="revenueChart" style="width: 100%; height: 300px;"></canvas>
+        </div>
+      </section>
+
+      <!-- TAB: ORDERS -->
+      <section id="tab-orders" class="view-tab">
+        <div class="header-action">
+          <h2>Order Management</h2>
+        </div>
+        <div class="table-wrapper">
+          <div id="ordersTableBox"><div class="loading-pane">Loading orders...</div></div>
+        </div>
+      </section>
+
+      <!-- TAB: PRODUCTS -->
+      <section id="tab-products" class="view-tab">
+        <div class="header-action">
+          <h2>Product Inventory</h2>
+          <button class="btn-action" onclick="openModal('productModal')">+ Add Product</button>
+        </div>
+        <div class="table-wrapper">
+          <div id="productsTableBox"><div class="loading-pane">Loading inventory...</div></div>
+        </div>
+      </section>
+
+      <!-- TAB: CUSTOMERS -->
+      <section id="tab-customers" class="view-tab">
+        <div class="header-action">
+          <h2>Customer Directory</h2>
+        </div>
+        <div class="table-wrapper">
+          <div id="customersTableBox"><div class="loading-pane">Parsing customer data...</div></div>
+        </div>
+      </section>
+
+      <!-- TAB: ANALYTICS -->
+      <section id="tab-analytics" class="view-tab">
+        <div class="header-action">
+          <h2>Sales Analytics</h2>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+          <div class="chart-container">
+            <h3 style="font-family:var(--font-accent); color:#888; font-size:0.9rem;text-transform:uppercase;margin-bottom:1rem;text-align:center;">Order Status Distribution</h3>
+            <canvas id="statusChart" style="width:100%;height:300px;"></canvas>
+          </div>
+          <div class="chart-container">
+             <h3 style="font-family:var(--font-accent); color:#888; font-size:0.9rem;text-transform:uppercase;margin-bottom:1rem;text-align:center;">Top Performing Items</h3>
+             <canvas id="itemsChart" style="width:100%;height:300px;"></canvas>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ADD PRODUCT MODAL -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add New Product</h3>
+        <button class="close-modal" onclick="closeModal('productModal')">×</button>
       </div>
+      <form id="addProductForm">
+        <div class="form-group">
+          <label>Product Name</label>
+          <input type="text" id="p_name" class="form-input" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Auto ID (Numeric)</label>
+            <input type="number" id="p_id" class="form-input" placeholder="e.g. 505" required>
+          </div>
+          <div class="form-group">
+            <label>Price (₹)</label>
+            <input type="number" id="p_price" class="form-input" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <!-- Using simple text input but can be expanded to select -->
+            <input type="text" id="p_category" class="form-input" placeholder="e.g. lays, bisuits" required>
+          </div>
+          <div class="form-group">
+            <label>Starting Stock</label>
+            <input type="number" id="p_stock" class="form-input" value="100" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Image URL Path (Optional)</label>
+          <input type="text" id="p_image" class="form-input" placeholder="/images/placeholder.png">
+        </div>
+        <button type="submit" class="btn-action" style="width:100%; margin-top:1rem;" id="btnSubmitProduct">SAVE PRODUCT</button>
+      </form>
     </div>
   </div>
+
 
   <script>
     const API_BASE = 'https://snacks-bazaar-production.up.railway.app/api';
-    let allOrders = [];
+    
+    // Application State Object
+    const state = {
+      orders: [],
+      products: [],
+      customers: [], // Derived
+      charts: {}
+    };
 
     // ── AUTHENTICATION ──
     document.getElementById('loginForm').addEventListener('submit', (e) => {
@@ -141,21 +273,14 @@
       
       if (u === 'admin' && p === 'snackbazaar2024') {
         sessionStorage.setItem('adminToken', 'granted');
-        showDashboard();
+        initApp();
       } else {
         document.getElementById('loginError').style.display = 'block';
       }
     });
 
     if (sessionStorage.getItem('adminToken') === 'granted') {
-      showDashboard();
-    }
-
-    function showDashboard() {
-      document.getElementById('loginOverlay').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      fetchOrders();
-      fetchProducts();
+      initApp();
     }
 
     function logout() {
@@ -163,190 +288,201 @@
       window.location.reload();
     }
 
-    // ── FETCH ORDERS ──
-    async function fetchOrders() {
-      try {
-        const res = await fetch(`${API_BASE}/orders?limit=100`);
-        const json = await res.json();
-        
-        if (json.success) {
-          allOrders = json.data;
-          renderDashboard(json.data);
-        } else {
-          document.getElementById('ordersContainer').innerHTML = `<p style="color:red">Error: ${json.message}</p>`;
-        }
-      } catch (err) {
-        document.getElementById('ordersContainer').innerHTML = `<p style="color:red">Failed to connect to backend: ${err.message}</p>`;
+    // ── CORE APP LOGIC ──
+    function initApp() {
+      document.getElementById('loginOverlay').style.display = 'none';
+      const layout = document.getElementById('appLayout');
+      layout.classList.remove('hidden');
+      layout.style.display = 'grid'; // override none
+      fetchBackendData();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+
+      document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+      
+      // Resize charts logic incase they were hidden
+      if(tabId === 'analytics' || tabId === 'dashboard') {
+        Object.values(state.charts).forEach(c => c.resize());
       }
     }
 
-    // ── RENDER ──
-    function renderDashboard(orders) {
-      // Calc Stats
-      const totalRev = orders.reduce((s, o) => s + (o.deliveryStatus !== 'cancelled' ? o.amount : 0), 0);
-      const pendingCount = orders.filter(o => o.deliveryStatus === 'pending' || o.deliveryStatus === 'confirmed').length;
+    async function fetchBackendData() {
+      try {
+        const [ordersRes, productsRes] = await Promise.all([
+          fetch(`${API_BASE}/orders?limit=300`),
+          fetch(`${API_BASE}/products?limit=300`)
+        ]);
 
-      document.getElementById('statOrders').textContent = orders.length;
-      document.getElementById('statRevenue').textContent = `₹${totalRev.toLocaleString()}`;
-      document.getElementById('statPending').textContent = pendingCount;
+        const oJson = await ordersRes.json();
+        const pJson = await productsRes.json();
 
-      // Table
-      if (orders.length === 0) {
-        document.getElementById('ordersContainer').innerHTML = '<div class="loading">No orders yet! Share your shop link to get sales.</div>';
-        return;
+        if (oJson.success) state.orders = oJson.data;
+        if (pJson.success) state.products = pJson.data;
+
+        deriveCustomers();
+        renderAllTabs();
+
+      } catch (err) {
+        console.error("Backend fetch error:", err);
+        alert("Failed to load live data!");
       }
+    }
 
+    // Process orders into unique customers
+    function deriveCustomers() {
+      const cMap = {};
+      state.orders.forEach(o => {
+        if (!o.customer) return;
+        const key = o.customer.email || o.customer.phone || 'Unknown';
+        if (!cMap[key]) {
+          cMap[key] = { 
+            name: o.customer.name || 'Guest', 
+            contact: key, 
+            address: o.customer.address || '', 
+            orderCount: 0, 
+            totalSpent: 0,
+            lastActive: o.createdAt
+          };
+        }
+        cMap[key].orderCount += 1;
+        if (o.deliveryStatus !== 'cancelled') {
+          cMap[key].totalSpent += o.amount;
+        }
+        if (new Date(o.createdAt) > new Date(cMap[key].lastActive)) {
+          cMap[key].lastActive = o.createdAt;
+        }
+      });
+      state.customers = Object.values(cMap).sort((a,b) => b.totalSpent - a.totalSpent);
+    }
+
+    function renderAllTabs() {
+      renderDashboard();
+      renderOrdersGrid();
+      renderProductsGrid();
+      renderCustomersGrid();
+      renderAnalytics();
+    }
+
+    // ── DASHBOARD TAB ──
+    function renderDashboard() {
+      const totalRev = state.orders.reduce((s, o) => s + (o.deliveryStatus !== 'cancelled' ? o.amount : 0), 0);
+      const pendingCount = state.orders.filter(o => o.deliveryStatus === 'pending' || o.deliveryStatus === 'confirmed').length;
+
+      document.getElementById('dashTotalRev').textContent = `₹${totalRev.toLocaleString()}`;
+      document.getElementById('dashTotalOrders').textContent = state.orders.length;
+      document.getElementById('dashPending').textContent = pendingCount;
+      document.getElementById('dashCustomers').textContent = state.customers.length;
+
+      // Group revenue by date
+      const revByDate = {};
+      state.orders.forEach(o => {
+        if (o.deliveryStatus === 'cancelled') return;
+        const d = new Date(o.createdAt).toLocaleDateString();
+        revByDate[d] = (revByDate[d] || 0) + o.amount;
+      });
+
+      const labels = Object.keys(revByDate).slice(-10); // Last 10 days
+      const data = labels.map(l => revByDate[l]);
+
+      renderChart('revenueChart', 'line', labels, data, 'Revenue (₹)', '#3b82f6');
+    }
+
+    // ── ORDERS TAB ──
+    function renderOrdersGrid() {
+      if (state.orders.length === 0) {
+        document.getElementById('ordersTableBox').innerHTML = '<div class="loading-pane">No orders exist.</div>'; return;
+      }
+      
       let html = `
         <table>
           <thead>
             <tr>
-              <th>ORDER ID</th>
+              <th>ID</th>
               <th>CUSTOMER</th>
-              <th>AMOUNT (PAYMENT)</th>
-              <th>ITEMS</th>
-              <th>DELIVERY STATUS</th>
+              <th>PAID?</th>
+              <th>TOTAL</th>
+              <th>STATUS</th>
               <th>DATE</th>
             </tr>
           </thead>
           <tbody>
       `;
 
-      orders.forEach(o => {
+      state.orders.forEach(o => {
         const payBadge = o.paymentStatus === 'paid' ? 'badge-paid' : 'badge-pending';
-        const methodBadge = o.paymentMethod === 'COD' ? 'badge-cod' : 'badge-paid';
-        const itemsList = o.items.map(i => `${i.qty}× ${i.name}`).join(', ');
         const date = new Date(o.createdAt).toLocaleString('en-IN', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-
+        
         html += `
           <tr>
             <td style="font-family:var(--font-accent); font-weight:700;">${o.orderId}</td>
+            <td><strong>${o.customer?.name || 'Guest'}</strong><br><span style="font-size:0.8rem;color:#888;">${o.customer?.phone || o.customer?.email}</span></td>
+            <td><span class="badge ${payBadge}">${o.paymentStatus}</span></td>
+            <td><strong>₹${o.amount.toFixed(2)}</strong></td>
             <td>
-              <div class="customer-info">
-                <strong>${o.customer.name || 'Guest'}</strong>
-                <span style="font-size:0.8rem;color:#888;">${o.customer.phone || 'No phone'}</span>
-                <span style="font-size:0.8rem;color:#888;max-width:200px;">${o.customer.address}</span>
-              </div>
+               <div style="display:flex; align-items:center;">
+                  <select class="status-select" id="stat-${o.orderId}" onchange="document.getElementById('save-${o.orderId}').classList.add('show')">
+                    <option value="pending" ${o.deliveryStatus === 'pending' ? 'selected' : ''}>Pending</option>
+                    <option value="confirmed" ${o.deliveryStatus === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+                    <option value="shipped" ${o.deliveryStatus === 'shipped' ? 'selected' : ''}>Shipped</option>
+                    <option value="delivered" ${o.deliveryStatus === 'delivered' ? 'selected' : ''}>Delivered</option>
+                    <option value="cancelled" ${o.deliveryStatus === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                  </select>
+                  <button class="btn-save" id="save-${o.orderId}" onclick="updateOrderStatus('${o.orderId}')">SAVE</button>
+               </div>
             </td>
-            <td>
-              <strong>₹${o.amount.toFixed(2)}</strong><br>
-              <span class="badge ${methodBadge}" style="margin-top:6px;">${o.paymentMethod || 'Online'}</span>
-              <span class="badge ${payBadge}" style="margin-top:6px;">${o.paymentStatus}</span>
-            </td>
-            <td style="max-width:250px;">
-              <div class="item-list">${itemsList}</div>
-            </td>
-            <td>
-              <div style="display:flex; align-items:center;">
-                <select class="status-select status-${o.deliveryStatus}" onchange="showSaveBtn('${o.orderId}')" id="status-${o.orderId}">
-                  <option value="pending" ${o.deliveryStatus === 'pending' ? 'selected' : ''}>Pending</option>
-                  <option value="confirmed" ${o.deliveryStatus === 'confirmed' ? 'selected' : ''}>Confirmed</option>
-                  <option value="shipped" ${o.deliveryStatus === 'shipped' ? 'selected' : ''}>Shipped</option>
-                  <option value="out_for_delivery" ${o.deliveryStatus === 'out_for_delivery' ? 'selected' : ''}>Out for Delivery</option>
-                  <option value="delivered" ${o.deliveryStatus === 'delivered' ? 'selected' : ''}>Delivered</option>
-                  <option value="cancelled" ${o.deliveryStatus === 'cancelled' ? 'selected' : ''}>Cancelled</option>
-                </select>
-                <button class="btn-save" id="btn-${o.orderId}" onclick="updateStatus('${o.orderId}', '${o._id}')">SAVE</button>
-              </div>
-            </td>
-            <td style="color:#888; font-size:0.8rem;">${date}</td>
+            <td style="font-size:0.85rem; color:#888;">${date}</td>
           </tr>
         `;
       });
       
       html += `</tbody></table>`;
-      document.getElementById('ordersContainer').innerHTML = html;
+      document.getElementById('ordersTableBox').innerHTML = html;
     }
 
-    // ── UPDATE STATUS ──
-    function showSaveBtn(orderId) {
-      document.getElementById(`btn-${orderId}`).classList.add('show');
-    }
-
-    async function updateStatus(customId, objectId) {
-      const select = document.getElementById(`status-${customId}`);
-      const btn = document.getElementById(`btn-${customId}`);
+    async function updateOrderStatus(orderId) {
+      const select = document.getElementById(`stat-${orderId}`);
+      const btn = document.getElementById(`save-${orderId}`);
       const newStatus = select.value;
-
       btn.textContent = '...';
-      btn.style.opacity = '0.7';
 
       try {
-        // If cancelled, call special cancel endpoint to restore stock
-        const endpoint = newStatus === 'cancelled' 
-          ? `${API_BASE}/orders/${customId}/cancel`
-          : `${API_BASE}/orders/${customId}/status`;
-
-        const method = newStatus === 'cancelled' ? 'PUT' : 'PUT';
-        const body = newStatus === 'cancelled' ? null : JSON.stringify({ status: newStatus });
-
+        const endpoint = newStatus === 'cancelled' ? `${API_BASE}/orders/${orderId}/cancel` : `${API_BASE}/orders/${orderId}/status`;
         const res = await fetch(endpoint, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body
+          body: newStatus === 'cancelled' ? null : JSON.stringify({ status: newStatus })
         });
-        
         const data = await res.json();
-        
-        if (data.success) {
-          btn.textContent = 'SAVED ✓';
+        if(data.success) {
+          btn.textContent = '✓';
           setTimeout(() => { btn.classList.remove('show'); btn.textContent = 'SAVE'; }, 1500);
-          // Refetch to reflect any paymentStatus changes (e.g. Delivered -> Paid)
-          fetchOrders();
-        } else {
-          alert('Error: ' + data.message);
-          btn.textContent = 'ERROR';
+          fetchBackendData(); // refresh all dependencies safely
         }
-      } catch (err) {
-        alert('Failed: ' + err.message);
+      } catch (e) {
+        alert("Failed to update");
         btn.textContent = 'SAVE';
       }
     }
 
-    // ── FETCH PRODUCTS & INVENTORY ──
-    async function fetchProducts() {
-      try {
-        const res = await fetch(`${API_BASE}/products?limit=100`);
-        const json = await res.json();
-        if (json.success) {
-          renderProductsAdmin(json.data);
-        } else {
-          document.getElementById('productsContainer').innerHTML = `<p style="color:red">Error: ${json.message}</p>`;
-        }
-      } catch (err) {
-        document.getElementById('productsContainer').innerHTML = `<p style="color:red">Failed to connect: ${err.message}</p>`;
-      }
-    }
 
-    function renderProductsAdmin(products) {
-      if (products.length === 0) {
-        document.getElementById('productsContainer').innerHTML = '<div class="loading">No products found.</div>';
-        return;
+    // ── PRODUCTS TAB ──
+    function renderProductsGrid() {
+      if (state.products.length === 0) {
+        document.getElementById('productsTableBox').innerHTML = '<div class="loading-pane">No products found.</div>'; return;
       }
-
-      let html = `
-        <table>
-          <thead>
-            <tr>
-              <th>PRODUCT</th>
-              <th>CATEGORY</th>
-              <th>PRICE</th>
-              <th>STOCK</th>
-              <th>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
+      let html = `<table><thead><tr><th>ITEM</th><th>CATEGORY</th><th>PRICE</th><th>STOCK</th><th>ACTION</th></tr></thead><tbody>`;
       
-      products.forEach(p => {
-        let stockColor = '#16a34a'; // green
-        if (p.stock === 0) stockColor = '#dc2626'; // red
-        else if (p.stock <= 10) stockColor = '#d97706'; // orange
+      state.products.forEach(p => {
+        let stockColor = p.stock === 0 ? '#dc2626' : (p.stock <= 10 ? '#d97706' : '#16a34a');
+        let badge = p.stock === 0 ? `<br><span class="badge" style="background:#ffe4e6; color:#e11d48; margin-top:4px;">OUT OF STOCK</span>` : '';
         
-        let stockBadge = p.stock === 0 ? `<br><span class="badge" style="background:#ffe4e6; color:#e11d48; margin-top:4px;">OUT OF STOCK</span>` : '';
-        
-        let toggleBtn = p.stock === 0 
-          ? `<button class="btn-save show" style="background:#16a34a;" onclick="toggleStock(${p.productId}, 100)">Mark In Stock</button>`
-          : `<button class="btn-save show" style="background:#e11d48;" onclick="toggleStock(${p.productId}, 0)">Mark Out of Stock</button>`;
+        let toggle = p.stock === 0 
+          ? `<button class="btn-save show" style="background:#16a34a;" onclick="updateProductStock(${p.productId}, 100)">Restock</button>`
+          : `<button class="btn-save show" style="background:#e11d48;" onclick="updateProductStock(${p.productId}, 0)">Deplete</button>`;
           
         html += `
           <tr>
@@ -358,35 +494,120 @@
             </td>
             <td><span style="text-transform:uppercase; font-size:0.8rem; color:#888;">${p.category}</span></td>
             <td>₹${p.price.toFixed(2)}</td>
-            <td>
-              <strong style="color:${stockColor}; font-size:1.1rem;">${p.stock}</strong>
-              ${stockBadge}
-            </td>
-            <td>${toggleBtn}</td>
+            <td><strong style="color:${stockColor}; font-size:1.1rem;">${p.stock}</strong>${badge}</td>
+            <td>${toggle}</td>
           </tr>
         `;
       });
       html += `</tbody></table>`;
-      document.getElementById('productsContainer').innerHTML = html;
+      document.getElementById('productsTableBox').innerHTML = html;
     }
 
-    async function toggleStock(productId, newStock) {
+    async function updateProductStock(id, newStock) {
       try {
-        const res = await fetch(`${API_BASE}/products/${productId}`, {
+        const res = await fetch(`${API_BASE}/products/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ stock: newStock })
         });
+        if((await res.json()).success) fetchBackendData();
+      } catch (e) { alert("Failed stock sync"); }
+    }
+
+
+    // ── ADD PRODUCT MODAL ──
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    
+    document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmitProduct');
+      btn.textContent = 'SAVING...'; btn.disabled = true;
+
+      const payload = {
+        productId: parseInt(document.getElementById('p_id').value),
+        name: document.getElementById('p_name').value,
+        price: parseFloat(document.getElementById('p_price').value),
+        category: document.getElementById('p_category').value,
+        stock: parseInt(document.getElementById('p_stock').value),
+        image: document.getElementById('p_image').value
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/products`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
         const data = await res.json();
         if(data.success) {
-          fetchProducts();
+          closeModal('productModal');
+          document.getElementById('addProductForm').reset();
+          fetchBackendData(); // refresh UI
         } else {
           alert('Error: ' + data.message);
         }
       } catch (err) {
-        alert('Stock update failed: ' + err.message);
+        alert('Server unreachable');
       }
+      btn.textContent = 'SAVE PRODUCT'; btn.disabled = false;
+    });
+
+    // ── CUSTOMERS TAB ──
+    function renderCustomersGrid() {
+      if (state.customers.length === 0) {
+        document.getElementById('customersTableBox').innerHTML = '<div class="loading-pane">No customers found.</div>'; return;
+      }
+      let html = `<table><thead><tr><th>CUSTOMER INFO</th><th>CONTACT (KEY)</th><th>LIFETIME ORDERS</th><th>LIFETIME SPENT</th></tr></thead><tbody>`;
+      
+      state.customers.forEach(c => {
+        html += `
+          <tr>
+            <td><strong>${c.name}</strong><br><span style="font-size:0.8rem;color:#888;">${c.address}</span></td>
+            <td><span class="badge" style="background:#f0f0f0;color:#555;">${c.contact}</span></td>
+            <td>${c.orderCount} records</td>
+            <td><strong style="color:var(--color-purple-deep);">₹${c.totalSpent.toFixed(2)}</strong></td>
+          </tr>
+        `;
+      });
+      html += `</tbody></table>`;
+      document.getElementById('customersTableBox').innerHTML = html;
     }
+
+    // ── ANALYTICS CHARTING ──
+    function renderAnalytics() {
+      // Status Distribution
+      const sMap = {};
+      state.orders.forEach(o => { sMap[o.deliveryStatus] = (sMap[o.deliveryStatus] || 0) + 1; });
+      renderChart('statusChart', 'doughnut', Object.keys(sMap), Object.values(sMap), 'Orders', ['#eab308', '#3b82f6', '#22c55e', '#ef4444']);
+
+      // Top Items Sold
+      const iMap = {};
+      state.orders.forEach(o => {
+        if(o.deliveryStatus === 'cancelled') return;
+        o.items.forEach(i => { iMap[i.name] = (iMap[i.name] || 0) + i.qty; });
+      });
+      
+      // Sort and take top 5
+      const sortedItems = Object.entries(iMap).sort((a,b) => b[1]-a[1]).slice(0, 5);
+      renderChart('itemsChart', 'bar', sortedItems.map(i => i[0]), sortedItems.map(i => i[1]), 'Quantity Sold', '#a855f7');
+    }
+
+    // Chart.js helper
+    function renderChart(canvasId, type, labels, data, label, colors) {
+      if(state.charts[canvasId]) state.charts[canvasId].destroy();
+      
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      state.charts[canvasId] = new Chart(ctx, {
+        type: type,
+        data: {
+          labels: labels,
+          datasets: [{ label: label, data: data, backgroundColor: colors, borderRadius: type === 'bar' ? 6 : 0 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+      });
+    }
+
   </script>
 </body>
 </html>
