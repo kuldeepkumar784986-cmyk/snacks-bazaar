@@ -5,7 +5,7 @@
 //  • Calls backend when available, degrades gracefully otherwise
 // ═══════════════════════════════════════════════════════════════
 
-const API_BASE = 'https://snacks-bazaar-production.up.railway.app/api';
+const API_BASE = 'https://snack-bazaar-proxy.kuldeepkumar784986.workers.dev/api';
 
 // ──────────────────── Cart State ────────────────────
 let cart = [];

@@ -6,7 +6,7 @@
 
 const API_URLS = {
   // ← Replace with your actual Worker URL after deploying
-  primary: 'https://snack-bazaar-proxy.YOUR-SUBDOMAIN.workers.dev/api',
+  primary: 'https://snack-bazaar-proxy.kuldeepkumar784986.workers.dev/api',
   backup:  'https://snacks-bazaar-production.up.railway.app/api',
 };
 

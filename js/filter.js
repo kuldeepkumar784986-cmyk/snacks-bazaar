@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!shopGrid) return; // Only run on shop page
 
-  const API_BASE = 'https://snacks-bazaar-production.up.railway.app/api';
+  const API_BASE = 'https://snack-bazaar-proxy.kuldeepkumar784986.workers.dev/api';
   let allProducts  = [];
 
   // ── Trending / New product IDs (for badges) ──

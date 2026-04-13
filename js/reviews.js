@@ -2,7 +2,7 @@
 //  SNACK BAZAAR — Customer Reviews Frontend
 // ═══════════════════════════════════════════════════════════════
 
-const REVIEWS_API = 'https://snacks-bazaar-production.up.railway.app/api';
+const REVIEWS_API = 'https://snack-bazaar-proxy.kuldeepkumar784986.workers.dev/api';
 
 // ── State ──
 let currentReviewProductId = null;
