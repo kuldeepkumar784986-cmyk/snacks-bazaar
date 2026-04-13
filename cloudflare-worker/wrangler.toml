@@ -1,0 +1,9 @@
+name = "snack-bazaar-proxy"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Uncomment after you get your Cloudflare account ID:
+# account_id = "your_cloudflare_account_id"
+
+[vars]
+BACKEND_URL = "https://snacks-bazaar-production.up.railway.app"
