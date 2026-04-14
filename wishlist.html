@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snack Bazaar | My Wishlist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Han+Sans&family=DM+Sans:wght@400;600;700&family=Nunito:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/nav.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <style>
+    .wishlist-page { max-width: 1200px; margin: 4rem auto; padding: 0 5%; }
+    .wishlist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .w-card { background: white; border-radius: 12px; padding: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; }
+    .w-img { width: 100%; height: 180px; object-fit: contain; border-radius: 8px; margin-bottom: 1rem; }
+    .w-title { font-weight: 700; color: var(--color-dark-text); font-size: 1.1rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .w-price { font-weight: 700; color: var(--color-primary); font-size: 1.1rem; margin: 0.5rem 0 1rem; }
+    .w-btn-group { display: flex; gap: 0.5rem; }
+    .w-btn-add { flex: 1; background: var(--color-primary); color: white; border: none; padding: 0.6rem; border-radius: 6px; font-weight: 700; cursor: pointer; }
+    .w-btn-rem { background: #f4f4f4; border: none; padding: 0.6rem; border-radius: 6px; cursor: pointer; color: #888; font-size: 1.2rem; }
+    .w-btn-rem:hover { background: #fee2e2; color: #dc2626; }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav__left"><a href="/shop.html">Shop</a></div>
+    <div class="nav__center">
+      <a href="/index.html" class="logo"><span class="logo-box"><span class="logo-wordmark"><span class="logo-icon">🍿</span><span class="logo-snack">SNACK</span><span class="logo-bazaar">BAZAAR</span></span></span></a>
+    </div>
+    <div class="nav__right">
+      <a href="/wishlist.html" aria-label="Wishlist" style="position:relative;">❤️ <span class="wishlist-count hidden" style="position:absolute; top:-8px; right:-12px; background:#ff4e00; color:white; min-width:20px; height:20px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; padding:0 4px; border:2px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.2); transition:opacity 0.2s, transform 0.2s;">0</span></a>
+      <a href="javascript:void(0)" aria-label="Cart" onclick="openCart()">🛒 <span class="cart-count">0</span></a>
+    </div>
+  </nav>
+
+  <div class="wishlist-page">
+    <h1 style="font-family:var(--font-display); font-size:2.5rem; color:var(--color-purple-deep);">MY WISHLIST</h1>
+    
+    <div id="wishlistContainer" class="wishlist-grid">
+      <!-- JS populated -->
+    </div>
+  </div>
+
+  <script src="/js/api-config.js"></script>
+  <script src="/js/wishlist.js"></script>
+  <script src="/js/cart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', renderWishlistPage);
+    document.addEventListener('wishlistUpdated', renderWishlistPage);
+
+    function renderWishlistPage() {
+      const container = document.getElementById('wishlistContainer');
+      const list = JSON.parse(localStorage.getItem('snack_wishlist')) || [];
+      
+      if (list.length === 0) {
+        container.style.display = 'block';
+        container.innerHTML = `
+          <div style="text-align:center; padding: 4rem 1rem; background:white; border-radius:12px; margin-top:2rem;">
+            <div style="font-size:3rem; margin-bottom:1rem;">💔</div>
+            <h2 style="font-family:var(--font-display); color:var(--color-purple-deep);">YOUR WISHLIST IS EMPTY</h2>
+            <p style="color:#666; margin:1rem 0 2rem;">Save your favorite snacks here, they miss you.</p>
+            <a href="/shop.html" style="background:var(--color-primary); color:white; padding:0.8rem 1.5rem; border-radius:999px; text-decoration:none; font-weight:700;">EXPLORE SNACKS</a>
+          </div>`;
+        return;
+      }
+      container.style.display = 'grid';
+      container.innerHTML = list.map(item => `
+        <div class="w-card">
+          <img src="${item.image}" alt="${item.name}" class="w-img">
+          <div class="w-title">${item.name}</div>
+          <div class="w-price">₹${parseFloat(item.price).toFixed(2)}</div>
+          <div class="w-btn-group">
+            <button class="w-btn-add" onclick="addToCart({id:${item.id},name:'${item.name.replace(/'/g, "\\'")}',price:${item.price},image:'${item.image}',qty:1}); showToast('✅ Added to cart!', 'success'); window.toggleWishlist(null, ${item.id})">MOVE TO CART</button>
+            <button class="w-btn-rem" onclick="window.toggleWishlist(null, ${item.id})" title="Remove">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

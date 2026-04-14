@@ -36,6 +36,7 @@
       <a href="/one-feeds-two.html">One Feeds Two</a>
       <a href="/find-ollys.html">Find Us</a>
       <a href="/account.html" aria-label="My Account">👤 My Account</a>
+      <a href="/wishlist.html" aria-label="Wishlist" style="position:relative;">❤️ <span class="wishlist-count hidden" style="position:absolute; top:-8px; right:-12px; background:#ff4e00; color:white; min-width:20px; height:20px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; padding:0 4px; border:2px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.2); transition:opacity 0.2s, transform 0.2s;">0</span></a>
       <a href="javascript:void(0)" aria-label="Cart" onclick="openCart()">🛒 <span class="cart-count">0</span></a>
     </div>
   </nav>
@@ -526,6 +527,7 @@
   <script src="/js/premium.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="/js/api-config.js"></script>
+  <script src="/js/wishlist.js"></script>
   <script src="/js/cart.js"></script>
   <script src="/js/carousel.js"></script>
   <script src="/js/animations.js"></script>
@@ -618,6 +620,7 @@
     // Promo code copy function
     function copyPromoCode(el, code) {
       navigator.clipboard.writeText(code).then(() => {
+        showToast('📋 Promo code copied!', 'success');
         const originalText = el.innerHTML;
         el.innerHTML = 'COPIED! ✅';
         el.style.backgroundColor = 'rgba(255,255,255,0.3)';

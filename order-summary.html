@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snack Bazaar | Order Summary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Han+Sans&family=DM+Sans:wght@400;600;700&family=Nunito:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/nav.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <link rel="stylesheet" href="/css/checkout.css">
+  <style>
+    .summary-page { max-width: 1200px; margin: 4rem auto; padding: 0 5%; display: flex; gap: 3rem; align-items: flex-start; }
+    .summary-cart { flex: 1.5; }
+    .summary-math { flex: 1; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 100px; }
+    .summary-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #eee; }
+    .summary-item img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 1.1rem; }
+    .summary-row.total { font-weight: 700; font-size: 1.4rem; border-top: 2px dashed #eee; padding-top: 1rem; margin-top: 1rem; }
+    .promo-box { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .promo-box input { flex:1; padding: 0.8rem; border: 1px solid #ddd; border-radius: 6px; font-family:var(--font-body); }
+    .promo-box button { background: var(--color-purple-deep); color:white; padding: 0 1rem; border:none; border-radius:6px; cursor:pointer; font-weight:700; }
+    @media (max-width: 768px) {
+      .summary-page { flex-direction: column; }
+      .summary-math { width: 100%; position: relative; top: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="nav__left"><a href="/shop.html">Shop</a></div>
+    <div class="nav__center">
+      <a href="/index.html" class="logo"><span class="logo-box"><span class="logo-wordmark"><span class="logo-icon">🍿</span><span class="logo-snack">SNACK</span><span class="logo-bazaar">BAZAAR</span></span></span></a>
+    </div>
+    <div class="nav__right">
+      <a href="/wishlist.html" aria-label="Wishlist" style="position:relative;">❤️ <span class="wishlist-count hidden" style="position:absolute; top:-8px; right:-12px; background:#ff4e00; color:white; min-width:20px; height:20px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; padding:0 4px; border:2px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.2); transition:opacity 0.2s, transform 0.2s;">0</span></a>
+      <a href="javascript:void(0)" aria-label="Cart" onclick="openCart()">🛒 <span class="cart-count">0</span></a>
+    </div>
+  </nav>
+
+  <div class="summary-page" id="summaryContainer">
+    <!-- Populated by JS -->
+  </div>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="/js/api-config.js"></script>
+  <script src="/js/wishlist.js"></script>
+  <script src="/js/cart.js"></script>
+  <script src="/js/order-summary.js"></script>
+</body>
+</html>

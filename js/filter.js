@@ -121,16 +121,28 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="product-card" data-category="${product.category}" style="position:relative;" data-aos="fade-up">
           ${badge}
           ${outOfStockBadge}
-          <div class="product-img-wrap">
-            <img src="${imageSrc}" alt="${product.name}" onerror="this.style.display='none'">
-          </div>
-          <div class="product-card__title" style="text-transform:uppercase;">${product.name}</div>
+          <button class="wishlist-btn ${window.snackWishlist && window.snackWishlist.includes(pid.toString()) ? 'active' : ''}" 
+                  onclick="window.toggleWishlist(event, ${pid}, '${safeName}', ${product.price}, '${imageSrc}')" 
+                  aria-label="Add to wishlist" 
+                  style="position:absolute; top:12px; right:12px; background:white; border:none; border-radius:50%; width:34px; height:34px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 6px rgba(0,0,0,0.1); cursor:pointer; z-index:10; font-size:1.2rem; transition:transform 0.2s;">
+            ${window.snackWishlist && window.snackWishlist.includes(pid.toString()) ? '❤️' : '♡'}
+          </button>
+          
+          <a href="/product.html?id=${pid}" style="text-decoration:none; color:inherit; display:block;">
+            <div class="product-img-wrap">
+              <img src="${imageSrc}" alt="${product.name}" onerror="this.style.display='none'">
+            </div>
+            <div class="product-card__title" style="text-transform:uppercase;">${product.name}</div>
+          </a>
+          
           ${stars}
           <div class="product-card__subtitle">MRP: ₹${product.price.toFixed(2)} ${product.weight ? '• '+product.weight : ''}</div>
           ${lowStockLabel}
           <div class="product-card__price">₹${product.price.toFixed(2)}</div>
+          
           ${btnHtml}
-          <a href="https://wa.me/917849861219?text=${encodeURIComponent('Hey! Check out ' + product.name + ' on Snack Bazaar 🍿 https://snacks-bazaar.vercel.app/shop.html')}"
+          
+          <a href="https://wa.me/917849861219?text=${encodeURIComponent('Hey! Check out ' + product.name + ' on Snack Bazaar 🍿 https://snacks-bazaar.vercel.app/product.html?id=' + pid)}"
              target="_blank" rel="noopener" class="wa-share-btn" title="Share on WhatsApp">
             💬 Share
           </a>

@@ -491,31 +491,60 @@ function resetPayBtn() {
   btn.textContent = `PAY ₹${total.toFixed(2)}`;
 }
 
-// ──────────────────── Toast ────────────────────
+// ──────────────────── Toast (Stackable) ────────────────────
 function showToast(message, type = 'info') {
-  const existing = document.getElementById('snackToast');
-  if (existing) existing.remove();
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.style.cssText = `
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 9999;
+      pointer-events: none;
+    `;
+    document.body.appendChild(container);
+  }
+
   const colors = { success: '#16a34a', error: '#dc2626', info: '#5B2ECC' };
   const toast = document.createElement('div');
-  toast.id = 'snackToast';
-  toast.textContent = message;
   toast.style.cssText = `
-    position:fixed;bottom:24px;left:50%;
-    transform:translateX(-50%) translateY(80px);
-    background:${colors[type]};color:white;
-    padding:12px 24px;border-radius:8px;
-    font-family:var(--font-body,sans-serif);font-weight:600;font-size:0.9rem;
-    z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);
-    transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-    white-space:nowrap;max-width:90vw;`;
-  document.body.appendChild(toast);
+    background: ${colors[type] || colors.info};
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: var(--font-body, sans-serif);
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: auto;
+  `;
+  toast.innerHTML = message;
+  
+  container.appendChild(toast);
+
+  // Trigger animation
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    toast.style.transform = 'translateX(-50%) translateY(0)';
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
   }));
+
+  // Auto remove after 2.5s
   setTimeout(() => {
-    toast.style.transform = 'translateX(-50%) translateY(80px)';
-    setTimeout(() => toast.remove(), 350);
-  }, 4000);
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+      if(toast.parentNode) toast.remove();
+    }, 300);
+  }, 2500);
 }
 
 // ──────────────────── DOMContentLoaded ────────────────────
@@ -525,11 +554,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const nav = document.querySelector('.nav');
   if (hamburger) hamburger.addEventListener('click', () => nav.classList.toggle('nav--mobile-open'));
 
-  // Wire CHECKOUT button → open checkout modal (not Razorpay directly)
+  // Wire CHECKOUT button → route to Order Summary Page
   document.querySelectorAll('.btn-checkout, .btn-add-to-cart').forEach(btn => {
     if (btn.textContent.trim().toUpperCase() === 'CHECKOUT') {
       btn.onclick = null;
-      btn.addEventListener('click', openCheckout);
+      btn.addEventListener('click', () => {
+        if (window.cart && window.cart.length > 0) {
+          window.location.href = '/order-summary.html';
+        } else {
+          showToast('Your cart is empty!', 'error');
+        }
+      });
     }
   });
 
