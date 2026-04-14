@@ -346,7 +346,7 @@
       <div class="flash-deal-left">
         <span class="flash-tag">⚡ FLASH DEAL</span>
         <h3 class="flash-title">FREE DELIVERY TODAY ONLY!</h3>
-        <p class="flash-sub">On all orders above ₹199 — Use code <strong>SNACK50</strong></p>
+        <p class="flash-sub">On all orders above ₹199 — Use code <strong class="promo-code" onclick="copyPromoCode(this, 'SNACK50')" title="Click to copy">SNACK50 📋</strong></p>
         <a href="/shop.html" class="flash-btn">Grab It Now →</a>
       </div>
       <div class="flash-deal-right">
@@ -614,6 +614,19 @@
       updateCountdown();
       setInterval(updateCountdown, 1000);
     })();
+
+    // Promo code copy function
+    function copyPromoCode(el, code) {
+      navigator.clipboard.writeText(code).then(() => {
+        const originalText = el.innerHTML;
+        el.innerHTML = 'COPIED! ✅';
+        el.style.backgroundColor = 'rgba(255,255,255,0.3)';
+        setTimeout(() => {
+          el.innerHTML = originalText;
+          el.style.backgroundColor = '';
+        }, 1500);
+      });
+    }
 
     // Number counter animation
     function animateCounters() {

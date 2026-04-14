@@ -1112,6 +1112,17 @@
 }
 .flash-sub { color: rgba(255,255,255,0.9); font-size: 1rem; margin: 0 0 1.25rem; }
 .flash-sub strong { color: white; font-weight: 800; letter-spacing: 0.05em; }
+.promo-code {
+  cursor: pointer;
+  border-bottom: 2px dashed rgba(255,255,255,0.7);
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+.promo-code:hover {
+  background: rgba(255,255,255,0.2);
+  border-bottom-color: white;
+}
 .flash-btn {
   display: inline-block;
   background: white;
