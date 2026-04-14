@@ -34,7 +34,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.success) {
         allProducts = data.data;
-        renderProducts(allProducts);
+
+        // Check for URL query param e.g. ?category=spicy
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryFilter = urlParams.get('category') || urlParams.get('filter');
+
+        let initialFilter = allProducts;
+        if (queryFilter) {
+          // Update active button if one exists for this filter
+          const matchingBtn = Array.from(filterBtns).find(b => b.dataset.filter === queryFilter);
+          filterBtns.forEach(b => b.classList.remove('active'));
+          if (matchingBtn) matchingBtn.classList.add('active');
+
+          if (CATEGORY_MAP[queryFilter]) {
+            initialFilter = allProducts.filter(CATEGORY_MAP[queryFilter]);
+          } else {
+            initialFilter = allProducts.filter(p => p.category === queryFilter);
+          }
+        }
+
+        renderProducts(initialFilter);
       } else {
         shopGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:red;">Failed to load snacks.</div>';
       }
@@ -124,11 +143,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1200);
   };
 
-  // ── Category map: filter button value → DB category string(s) ──
+  // ── Category map: filter button value & URL param → DB category string(s) ──
   // Some brands share a DB category (e.g. Too Yumm is stored as 'healthy')
   const CATEGORY_MAP = {
     'too-yumm':    p => p.category === 'healthy' && p.name.toLowerCase().includes('too yumm'),
     'soya-chips':  p => p.category === 'healthy' && p.name.toLowerCase().includes('soya'),
+    'spicy':       p => ['kurkure', 'bingo', 'namkeen'].includes(p.category),
+    'tea':         p => p.category === 'biscuits',
+    'healthy':     p => p.category === 'healthy',
+    'nuts':        p => p.category === 'dry-fruits',
+    'movie':       p => p.category === 'popcorn',
+    'sweet':       p => p.category === 'sweets'
   };
 
   // ── Filtering ──
