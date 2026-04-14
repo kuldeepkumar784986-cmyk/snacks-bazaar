@@ -1234,4 +1234,167 @@
   100% { transform: translateX(-50%); }
 }
 
+/* ═══════════════════════════════════════════════════════
+   SKELETON LOADERS
+   ═══════════════════════════════════════════════════════ */
+.skeleton-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  height: 100%;
+}
+.skeleton-line {
+  background: #eee;
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+  border-radius: 8px;
+}
+.skeleton-img { height: 180px; width: 100%; border-radius: 12px; margin-bottom: 0.5rem; }
+.skeleton-title { height: 24px; width: 70%; }
+.skeleton-sub { height: 16px; width: 50%; }
+.skeleton-price { height: 20px; width: 40%; margin-top: 0.5rem; }
+.skeleton-btn { height: 45px; width: 100%; border-radius: 999px; margin-top: auto; }
+
+@keyframes shimmer {
+  to { background-position-x: -200%; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   PRODUCT SEARCH BAR
+   ═══════════════════════════════════════════════════════ */
+.search-container {
+  max-width: 800px;
+  margin: 2rem auto 0;
+  padding: 0 1.5rem;
+}
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 999px;
+  border: 2px solid #eee;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.search-box:focus-within {
+  border-color: #ff8800;
+  box-shadow: 0 8px 25px rgba(255, 136, 0, 0.15);
+}
+.search-icon {
+  font-size: 1.2rem;
+  margin-right: 0.8rem;
+  color: #888;
+}
+.search-box input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 1.05rem;
+  color: #333;
+  outline: none;
+  font-family: inherit;
+}
+.search-box input::placeholder { color: #aaa; }
+.clear-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #aaa;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  display: none;
+  transition: color 0.2s;
+}
+.clear-btn:hover { color: #ff4e00; }
+.search-box input:not(:placeholder-shown) + .clear-btn {
+  display: block;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CART BADGE
+   ═══════════════════════════════════════════════════════ */
+.nav__right a[aria-label="Cart"] {
+  position: relative;
+}
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -12px;
+  background: #ff4e00;
+  color: white;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0 4px;
+  border: 2px solid white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: opacity 0.2s, transform 0.2s;
+}
+.cart-count.hidden {
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+}
+@keyframes badge-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+.badge-pop {
+  animation: badge-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ═══════════════════════════════════════════════════════
+   BACK TO TOP BUTTON
+   ═══════════════════════════════════════════════════════ */
+#backToTop {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, background-color 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#backToTop.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+#backToTop:hover {
+  background-color: var(--color-secondary);
+  transform: translateY(-3px);
+}
+@media (max-width: 768px) {
+  #backToTop {
+    bottom: 90px; /* Above mobile bottom nav */
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    font-size: 1.2rem;
+  }
+}
 

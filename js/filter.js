@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const API_BASE = 'https://snack-bazaar-proxy.kuldeepkumar784986.workers.dev/api';
   let allProducts  = [];
+  let currentCategory = 'all';
+  let currentSearch = '';
+
+  const searchInput = document.getElementById('productSearch');
+  const clearSearchBtn = document.getElementById('clearSearch');
 
   // ── Trending / New product IDs (for badges) ──
   const TRENDING_IDS  = new Set([101, 102, 104, 106, 120]);
@@ -39,21 +44,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const queryFilter = urlParams.get('category') || urlParams.get('filter');
 
-        let initialFilter = allProducts;
         if (queryFilter) {
-          // Update active button if one exists for this filter
-          const matchingBtn = Array.from(filterBtns).find(b => b.dataset.filter === queryFilter);
-          filterBtns.forEach(b => b.classList.remove('active'));
-          if (matchingBtn) matchingBtn.classList.add('active');
-
-          if (CATEGORY_MAP[queryFilter]) {
-            initialFilter = allProducts.filter(CATEGORY_MAP[queryFilter]);
+          currentCategory = queryFilter;
+          const matchingBtn = Array.from(filterBtns).find(b => b.dataset.filter === currentCategory);
+          if (matchingBtn) {
+             filterBtns.forEach(b => b.classList.remove('active'));
+             matchingBtn.classList.add('active');
           } else {
-            initialFilter = allProducts.filter(p => p.category === queryFilter);
+             filterBtns.forEach(b => b.classList.remove('active'));
           }
         }
 
-        renderProducts(initialFilter);
+        applyFilters();
       } else {
         shopGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;color:red;">Failed to load snacks.</div>';
       }
@@ -66,7 +68,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Render products ──
   function renderProducts(products) {
     if (products.length === 0) {
-      shopGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:2rem;">No snacks found here!</div>';
+      if (currentSearch) {
+        shopGrid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem 1rem;">
+          <h3 style="color:#3d1d91;margin-bottom:0.8rem;">No products found for "<em>${currentSearch}</em>"</h3>
+          <p style="color:#666;">Try adjusting your search or clearing the filters.</p>
+        </div>`;
+      } else {
+        shopGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem 1rem;">No snacks found here!</div>';
+      }
       return;
     }
 
@@ -156,24 +165,52 @@ document.addEventListener('DOMContentLoaded', () => {
     'sweet':       p => p.category === 'sweets'
   };
 
-  // ── Filtering ──
+  // ── Apply Filters (Category + Search) ──
+  function applyFilters() {
+    let filtered = allProducts;
+
+    // Apply category
+    if (currentCategory !== 'all') {
+      if (CATEGORY_MAP[currentCategory]) {
+        filtered = filtered.filter(CATEGORY_MAP[currentCategory]);
+      } else {
+        filtered = filtered.filter(p => p.category === currentCategory);
+      }
+    }
+
+    // Apply search
+    if (currentSearch) {
+      const q = currentSearch.toLowerCase();
+      filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+    }
+
+    renderProducts(filtered);
+  }
+
+  // ── Event Listeners ──
   if (filterBtns.length > 0) {
     filterBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        const filter = btn.dataset.filter;
+        currentCategory = btn.dataset.filter;
         filterBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
-        let filtered;
-        if (filter === 'all') {
-          filtered = allProducts;
-        } else if (CATEGORY_MAP[filter]) {
-          filtered = allProducts.filter(CATEGORY_MAP[filter]);
-        } else {
-          filtered = allProducts.filter(p => p.category === filter);
-        }
-        renderProducts(filtered);
+        applyFilters();
       });
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      currentSearch = e.target.value.trim();
+      applyFilters();
+    });
+  }
+
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      currentSearch = '';
+      applyFilters();
     });
   }
 

@@ -64,7 +64,17 @@ function updateCartUI() {
 
   const countEls = document.querySelectorAll('.cart-count');
   const totalQty = cart.reduce((s, i) => s + i.qty, 0);
-  countEls.forEach(el => el.textContent = totalQty);
+  countEls.forEach(el => {
+    el.textContent = totalQty;
+    if (totalQty > 0) {
+      el.classList.remove('hidden');
+      el.classList.remove('badge-pop');
+      void el.offsetWidth; // Reflow to restart animation
+      el.classList.add('badge-pop');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
 
   // Update sticky mobile cart bar
   const stickyBar = document.getElementById('stickyCartBar');
@@ -521,6 +531,25 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.onclick = null;
       btn.addEventListener('click', openCheckout);
     }
+  });
+
+  // ── Back to Top Button ──
+  const bttBtn = document.createElement('button');
+  bttBtn.id = 'backToTop';
+  bttBtn.title = 'Back to top';
+  bttBtn.innerHTML = '⬆';
+  document.body.appendChild(bttBtn);
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      bttBtn.classList.add('visible');
+    } else {
+      bttBtn.classList.remove('visible');
+    }
+  });
+
+  bttBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 });
 /* cache bust */
