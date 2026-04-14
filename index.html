@@ -298,10 +298,106 @@
         <button class="btn-primary" onclick="addToCart({id:4,name:'Tomato Madness Bingo',price:20})">Add to cart</button>
         <div class="star-rating">★★★★★ <small>136 reviews</small></div>
       </div>
+  </section>
+
+  <!-- ═══ SHOP BY MOOD ═══ -->
+  <section class="mood-section reveal" data-aos="fade-up">
+    <div class="mood-header">
+      <h2 class="mood-title">WHAT'S YOUR SNACK MOOD?</h2>
+      <p class="mood-sub">Pick a vibe, we'll find your snack 🎯</p>
+    </div>
+    <div class="mood-grid">
+      <a href="/shop.html?filter=kurkure" class="mood-card mood-card--spicy">
+        <div class="mood-emoji">🌶️</div>
+        <div class="mood-label">EXTRA SPICY</div>
+        <div class="mood-desc">For the bold ones</div>
+      </a>
+      <a href="/shop.html?filter=biscuits" class="mood-card mood-card--tea">
+        <div class="mood-emoji">☕</div>
+        <div class="mood-label">TEA TIME</div>
+        <div class="mood-desc">Biscuits & chai</div>
+      </a>
+      <a href="/shop.html?filter=healthy" class="mood-card mood-card--healthy">
+        <div class="mood-emoji">🥗</div>
+        <div class="mood-label">GUILT FREE</div>
+        <div class="mood-desc">Healthy snacking</div>
+      </a>
+      <a href="/shop.html?filter=dry-fruits" class="mood-card mood-card--nuts">
+        <div class="mood-emoji">🌰</div>
+        <div class="mood-label">NUTS & SEEDS</div>
+        <div class="mood-desc">Protein packed</div>
+      </a>
+      <a href="/shop.html?filter=popcorn" class="mood-card mood-card--movie">
+        <div class="mood-emoji">🍿</div>
+        <div class="mood-label">MOVIE NIGHT</div>
+        <div class="mood-desc">Popcorn & puffs</div>
+      </a>
+      <a href="/shop.html?filter=sweets" class="mood-card mood-card--sweet">
+        <div class="mood-emoji">🍬</div>
+        <div class="mood-label">SWEET TOOTH</div>
+        <div class="mood-desc">Mithai & sweets</div>
+      </a>
     </div>
   </section>
 
-  <!-- Charity Banner -->
+  <!-- ═══ FLASH DEAL BANNER ═══ -->
+  <section class="flash-deal-banner reveal" data-aos="zoom-in">
+    <div class="flash-deal-inner">
+      <div class="flash-deal-left">
+        <span class="flash-tag">⚡ FLASH DEAL</span>
+        <h3 class="flash-title">FREE DELIVERY TODAY ONLY!</h3>
+        <p class="flash-sub">On all orders above ₹199 — Use code <strong>SNACK50</strong></p>
+        <a href="/shop.html" class="flash-btn">Grab It Now →</a>
+      </div>
+      <div class="flash-deal-right">
+        <div class="countdown-box">
+          <div class="countdown-label">Ends in</div>
+          <div class="countdown-timer">
+            <div class="countdown-unit"><span id="cdH">00</span><small>HRS</small></div>
+            <div class="countdown-colon">:</div>
+            <div class="countdown-unit"><span id="cdM">00</span><small>MIN</small></div>
+            <div class="countdown-colon">:</div>
+            <div class="countdown-unit"><span id="cdS">00</span><small>SEC</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ BRAND LOGOS MARQUEE ═══ -->
+  <section class="brands-section reveal" data-aos="fade-up">
+    <p class="brands-label">🛒 BRANDS WE CARRY</p>
+    <div class="brands-track-wrap">
+      <div class="brands-track">
+        <span class="brand-pill">🌶️ Kurkure</span>
+        <span class="brand-pill">🥔 Lay's</span>
+        <span class="brand-pill">🍟 Bingo!</span>
+        <span class="brand-pill">🍪 Uncle Chipps</span>
+        <span class="brand-pill">🌀 Balaji</span>
+        <span class="brand-pill">🏅 Haldiram's</span>
+        <span class="brand-pill">🎯 Bikaji</span>
+        <span class="brand-pill">⚡ Too Yumm</span>
+        <span class="brand-pill">🍿 Act II</span>
+        <span class="brand-pill">💫 Yellow Diamond</span>
+        <span class="brand-pill">🌟 Parle</span>
+        <span class="brand-pill">✨ Britannia</span>
+        <!-- duplicate for loop -->
+        <span class="brand-pill">🌶️ Kurkure</span>
+        <span class="brand-pill">🥔 Lay's</span>
+        <span class="brand-pill">🍟 Bingo!</span>
+        <span class="brand-pill">🍪 Uncle Chipps</span>
+        <span class="brand-pill">🌀 Balaji</span>
+        <span class="brand-pill">🏅 Haldiram's</span>
+        <span class="brand-pill">🎯 Bikaji</span>
+        <span class="brand-pill">⚡ Too Yumm</span>
+        <span class="brand-pill">🍿 Act II</span>
+        <span class="brand-pill">💫 Yellow Diamond</span>
+        <span class="brand-pill">🌟 Parle</span>
+        <span class="brand-pill">✨ Britannia</span>
+      </div>
+    </div>
+  </section>
+
   <section class="charity-banner" data-aos="fade-up" ripple-bg reveal">
     <div class="charity-banner__text">
       <h2>WITH EVERY ORDER PLACED, WE DONATE A SCHOOL MEAL TO A CHILD IN NEED.</h2>
@@ -484,6 +580,29 @@
   <script>
     // AOS init
     AOS.init({ duration: 700, once: true, offset: 60, easing: 'ease-out-cubic' });
+
+    // Flash Deal Countdown — counts down to midnight today
+    (function() {
+      function updateCountdown() {
+        const now = new Date();
+        const midnight = new Date();
+        midnight.setHours(23, 59, 59, 0);
+        const diff = midnight - now;
+        if (diff <= 0) return;
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        const pad = n => String(n).padStart(2,'0');
+        const cdH = document.getElementById('cdH');
+        const cdM = document.getElementById('cdM');
+        const cdS = document.getElementById('cdS');
+        if (cdH) cdH.textContent = pad(h);
+        if (cdM) cdM.textContent = pad(m);
+        if (cdS) cdS.textContent = pad(s);
+      }
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    })();
 
     // Number counter animation
     function animateCounters() {
