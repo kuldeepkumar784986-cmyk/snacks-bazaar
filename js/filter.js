@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadProducts() {
     showSkeletons(8);
     try {
-      const response = await fetch(`${API_BASE}/products`);
+      const response = await fetch(`${API_BASE}/products?limit=200`);
       const data     = await response.json();
 
       if (data.success) {
@@ -124,6 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1200);
   };
 
+  // ── Category map: filter button value → DB category string(s) ──
+  // Some brands share a DB category (e.g. Too Yumm is stored as 'healthy')
+  const CATEGORY_MAP = {
+    'too-yumm':    p => p.category === 'healthy' && p.name.toLowerCase().includes('too yumm'),
+    'soya-chips':  p => p.category === 'healthy' && p.name.toLowerCase().includes('soya'),
+  };
+
   // ── Filtering ──
   if (filterBtns.length > 0) {
     filterBtns.forEach(btn => {
@@ -131,7 +138,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const filter = btn.dataset.filter;
         filterBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderProducts(filter === 'all' ? allProducts : allProducts.filter(p => p.category === filter));
+
+        let filtered;
+        if (filter === 'all') {
+          filtered = allProducts;
+        } else if (CATEGORY_MAP[filter]) {
+          filtered = allProducts.filter(CATEGORY_MAP[filter]);
+        } else {
+          filtered = allProducts.filter(p => p.category === filter);
+        }
+        renderProducts(filtered);
       });
     });
   }
