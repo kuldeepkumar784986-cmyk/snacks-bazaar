@@ -8,7 +8,7 @@
 const API_BASE = 'https://snack-bazaar-proxy.kuldeepkumar784986.workers.dev/api';
 
 // ──────────────────── Cart State ────────────────────
-let cart = [];
+let cart = JSON.parse(localStorage.getItem('snack_cart')) || [];
 
 function addToCart(product) {
   const existing = cart.find(item => item.id === product.id);
@@ -29,6 +29,7 @@ function addToCart(product) {
 
 // ──────────────────── Cart UI ────────────────────
 function updateCartUI() {
+  localStorage.setItem('snack_cart', JSON.stringify(cart));
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
   const totalElement = document.getElementById('cartTotal');
@@ -559,7 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btn.textContent.trim().toUpperCase() === 'CHECKOUT') {
       btn.onclick = null;
       btn.addEventListener('click', () => {
-        if (window.cart && window.cart.length > 0) {
+        if (cart && cart.length > 0) {
           window.location.href = '/order-summary.html';
         } else {
           showToast('Your cart is empty!', 'error');
